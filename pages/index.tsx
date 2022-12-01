@@ -14,6 +14,7 @@ export default function Home({ allPostsData }) {
         <title>{siteTitle}</title>
       </Head>
       <main>
+        <h1 className="text-3xl font-bold underline">Hello world!</h1>
         <section className={utilStyles.headingMd}>
           <p>Hello, I'm WJ. I'm a software enginer!</p>
           <p>
@@ -49,4 +50,4 @@ export const getStaticProps: GetStaticProps = async () => {
       allPostsData,
     },
   };
-}
+};
