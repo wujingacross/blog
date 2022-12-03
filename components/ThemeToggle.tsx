@@ -186,6 +186,7 @@ function useTheme() {
 
       window.removeEventListener("storage", onStorage);
     };
+    // eslint-disable-next-line
   }, []);
 
   return [setting, setSetting];
