@@ -1,6 +1,6 @@
+import { Fragment, useEffect, useRef } from "react";
 import create from "zustand";
 import clsx from "clsx";
-import { Fragment, useEffect, useRef } from "react";
 import { Listbox } from "@headlessui/react";
 import { useIsomorphicLayoutEffect } from "hooks/useIsomorphicLayoutEffect";
 
@@ -128,7 +128,7 @@ let settings = [
 ];
 
 function useTheme() {
-  let { setting, setSetting } = useSetting();
+  let { setting, setSetting } = useSetting() as any;
   let initial = useRef(true);
 
   useIsomorphicLayoutEffect(() => {
