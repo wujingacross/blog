@@ -1,11 +1,51 @@
+import Link from "next/link";
 import { ThemeToggle } from "components/ThemeToggle";
+
+export function NavItems() {
+  return (
+    <>
+      <li>
+        <a
+          href="https://tailwindui.com/?ref=top"
+          className="hover:text-sky-500 dark:hover:text-sky-400"
+        >
+          Components
+        </a>
+      </li>
+      <li>
+        <Link
+          href="/blog"
+          className="hover:text-sky-500 dark:hover:text-sky-400"
+        >
+          Blog
+        </Link>
+      </li>
+      <li>
+        <Link
+          href="/showcase"
+          className="hover:text-sky-500 dark:hover:text-sky-400"
+        >
+          Showcase
+          <span className="ml-2 font-medium text-xs leading-5 rounded-full text-sky-600 bg-sky-400/10 px-2 py-0.5  dark:text-sky-400">
+            New
+          </span>
+        </Link>
+      </li>
+    </>
+  );
+}
 
 export default function Header() {
   return (
-    <header className="relative">
+    <header className="relative font-semibold text-sm leading-6 text-slate-700 dark:text-slate-200">
       <div className="flex justify-between">
         Logo
-        <div>
+        <div className="flex items-center">
+          <nav>
+            <ul className="flex items-center space-x-8">
+              <NavItems />
+            </ul>
+          </nav>
           <div className="flex items-center ml-6 pl-6 border-l border-slate-200 dark:border-slate-800">
             <ThemeToggle />
             <a
