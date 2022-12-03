@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./Header";
-import styles from "./lay.module.css";
+import styles from "./Lay.module.css";
 import utilStyles from "styles/utils.module.css";
 
 const name = "WJ";
