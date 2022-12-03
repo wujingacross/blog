@@ -19,7 +19,7 @@ export default function Home({ allPostsData }) {
       <main>
         <h1 className="text-3xl font-bold underline">Hello world!</h1>
         <section className={utilStyles.headingMd}>
-          <p>Hello, I'm WJ. I'm a software enginer!</p>
+          <p>Hello, I&apos;m WJ. I&apos;m a software enginer!!</p>
           <p>
             (This is my website - you’ll be building a site like this on{" "}
             <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
