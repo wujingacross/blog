@@ -1,8 +1,8 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Date from "components/date";
-import Layout, { siteTitle } from "components/layout";
+import Date from "components/DateN";
+import Layout, { siteTitle } from "components/Lay";
 import utilStyles from "styles/utils.module.css";
 import { getSortedPostsData } from "lib/posts";
 
@@ -11,6 +11,9 @@ export default function Home({ allPostsData }) {
   return (
     <Layout home>
       <Head>
+        <title>{siteTitle}</title>
+        <meta key="twitter:title" name="twitter:title" content={siteTitle} />
+        <meta key="og:title" property="og:title" content={siteTitle} />
         <title>{siteTitle}</title>
       </Head>
       <main>

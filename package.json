@@ -7,13 +7,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.4",
+    "clsx": "^1.2.1",
     "date-fns": "^2.29.3",
     "gray-matter": "^4.0.3",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "remark": "^14.0.2",
-    "remark-html": "^15.0.1"
+    "remark-html": "^15.0.1",
+    "zustand": "^4.1.4"
   },
   "devDependencies": {
     "@types/node": "18.11.9",
