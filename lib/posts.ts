@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-import html from "remark-html";
+// import html from "remark-html";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
@@ -71,15 +71,52 @@ export async function getPostData(id) {
   const matterResult = matter(fileContents);
 
   // Use remark to convert markdown into HTML string
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
-  const contentHtml = processedContent.toString();
+  // const processedContent = await remark()
+  //   .use(html)
+  //   .process(matterResult.content);
+  // const contentHtml = processedContent.toString();
 
   // Combine the data with the id and contentHtml
   return {
     id,
-    contentHtml,
+    contentHtml: "",
     ...(matterResult.data as { date: string; title: string }),
   };
+}
+
+// /************ */
+// function importAll(r) {
+//   return r
+//     .keys()
+//     .filter((filename) => filename.startsWith("."))
+//     .map((filename) => ({
+//       slug: filename.substr(2).replace(/\/index\.mdx$/, ""),
+//       filename,
+//       module: r(filename),
+//     }))
+//     .filter(({ slug }) => !slug.includes("/snippets/"))
+//     .filter((p) => p.module.meta.private !== true)
+//     .sort((a, b) => dateSortDesc(a.module.meta.date, b.module.meta.date));
+// }
+
+// function dateSortDesc(a, b) {
+//   if (a > b) return -1;
+//   if (a < b) return 1;
+//   return 0;
+// }
+
+export function getAllPostPreviews() {
+  const files = require.context("../pages", false, /\.mdx$/);
+  console.log("ttttttt", files, files[0]);
+  files
+    .keys()
+    .filter((filename) => filename.startsWith("."))
+    .map((filename) => ({
+      slug: filename.substr(2).replace(/\.mdx$/, ""),
+      filename,
+      f: filename.substr(2),
+      module: files[filename.substr(2)],
+    }))
+    .forEach((item) => console.log("item", item));
+  // return importAll(require.context("../pages/blog/?preview", true, /\.mdx$/));
 }
