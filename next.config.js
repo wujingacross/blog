@@ -170,6 +170,7 @@ module.exports = {
             )
           ) {
             console.log("zzzzz", this.resourcePath);
+            // 不同目录下的mdx,添加不同的布局组件
             for (let glob in fallbackDefaultExports) {
               console.log(
                 "zzzzz1",
