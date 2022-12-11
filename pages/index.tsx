@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Layout, { siteTitle } from "components/Lay";
+import Layout, { siteTitle } from "components/Layout";
 import utilStyles from "styles/utils.module.css";
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
       <main>
         <h1 className="text-3xl font-bold underline">Hello world!</h1>
-        <section className={utilStyles.headingMd}>
+        <section>
           <p>Hello, I&apos;m WJ... I&apos;m a software enginer!!</p>
           <p>
             (This is my website - you’ll be building a site like this on{" "}

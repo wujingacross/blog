@@ -11,7 +11,7 @@ export function TabBar({
   return (
     <div className="flex text-slate-400 text-xs leading-6">
       <div className="flex-none text-sky-300 border-t border-b border-t-transparent border-b-sky-300 px-4 py-1 flex items-center">
-        {primary.name}-1234
+        {primary.name}-TabBar
         {showTabMarkers &&
           (primary.saved ? (
             <svg

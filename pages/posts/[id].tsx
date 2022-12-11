@@ -1,9 +1,8 @@
 import { GetStaticProps, GetStaticPaths } from "next";
 import Head from "next/head";
-import Layout from "components/Lay";
+import Layout from "components/Layout";
 import { getAllPostIds, getPostData } from "lib/posts";
 import Date from "components/DateN";
-import utilStyles from "styles/utils.module.css";
 
 export default function Post({ postData }) {
   return (
@@ -12,9 +11,9 @@ export default function Post({ postData }) {
         <title>{postData.title}</title>
       </Head>
       <article>
-        <h1 className={utilStyles.headingXl}> {postData.title}</h1>
+        <h1> {postData.title}</h1>
       </article>
-      <div className={utilStyles.lightText}>
+      <div>
         <Date dateString={postData.date} />
       </div>
       <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />

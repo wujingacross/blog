@@ -1,10 +1,9 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import { getSortedPostsData, getAllPostPreviews } from "lib/posts";
-import Layout from "components/Lay";
+import Layout from "components/Layout";
 import { Widont } from "components/Widont";
 import Date from "components/DateN";
-import utilStyles from "styles/utils.module.css";
 
 export default function Blog({ allPostsData }) {
   console.log("allPostsData: ", allPostsData);
@@ -30,7 +29,7 @@ export default function Blog({ allPostsData }) {
             <article key={id} className="relative group">
               <Link href={`/posts/${id}`}>{title}</Link>
               <br />
-              <small className={utilStyles.lightText}>
+              <small>
                 <Date dateString={date} />
               </small>
               <div className="relative">

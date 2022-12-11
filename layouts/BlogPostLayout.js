@@ -31,7 +31,6 @@ export function BlogPostLayout({ children, meta }) {
           </Link>
         </div>
       </div>
-      <div className="pb-10">pppp</div>
       <div className="px-4 sm:px-6 md:px-8">
         <div className="max-w-3xl mx-auto pb-28">
           <main>

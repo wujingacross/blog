@@ -1,1 +1,4 @@
-@import 'utilities.css'
+@import 'utilities.css';
+@import 'docsearch.css';
+@import 'prism.css';
+@import 'fonts.css';

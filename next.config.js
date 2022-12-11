@@ -44,17 +44,17 @@ module.exports = {
           plugins === null
             ? {}
             : {
-                remarkPlugins: [
-                  withPrevalInstructions,
-                  withExamples,
-                  withTableOfContents,
-                  withSyntaxHighlighting,
-                  withNextLinks,
-                  withSmartQuotes,
-                  ...plugins,
-                ],
-                rehypePlugins: [withLinkRoles],
-              },
+              remarkPlugins: [
+                withPrevalInstructions,
+                withExamples,
+                withTableOfContents,
+                withSyntaxHighlighting,
+                withNextLinks,
+                withSmartQuotes,
+                ...plugins,
+              ],
+              rehypePlugins: [withLinkRoles],
+            },
       },
       createLoader(function (source) {
         console.log("mainMdxLoader 3 -----");
@@ -218,8 +218,8 @@ module.exports = {
               typeof fields === "undefined"
                 ? `export const meta = ${JSON.stringify(meta)}`
                 : `export const meta = /*START_META*/${JSON.stringify(
-                    meta || {}
-                  )}/*END_META*/`;
+                  meta || {}
+                )}/*END_META*/`;
           }
 
           return [
