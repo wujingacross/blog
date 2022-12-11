@@ -4,15 +4,13 @@ module.exports.withNextLinks = () => {
   return (tree) => {
     const component = addDefaultImport(tree, "next/link", "Link");
 
-    console.log("withNextLinks", component);
-
     function walk(root) {
       if (!root.children) return;
       let i = 0;
       while (i < root.children.length) {
         let node = root.children[i];
+        // 仅处理相对路径
         if (node.type === "link" && node.url.startsWith("/")) {
-          console.log("withNextLinks2", node);
           root.children = [
             ...root.children.slice(0, i),
             {

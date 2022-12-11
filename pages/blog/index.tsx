@@ -1,9 +1,13 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
-import { getSortedPostsData, getAllPostPreviews } from "lib/posts";
+import { getSortedPostsData } from "lib/posts";
+import { getAllPostPreviews } from "lib/getAllPosts";
 import Layout from "components/Layout";
 import { Widont } from "components/Widont";
 import Date from "components/DateN";
+
+const posts = getAllPostPreviews()
+console.log('dddddd3', posts)
 
 export default function Blog({ allPostsData }) {
   console.log("allPostsData: ", allPostsData);
@@ -43,18 +47,40 @@ export default function Blog({ allPostsData }) {
             </article>
           ))}
         </div>
+
+        <div className="space-y-16">
+          {posts.map(({ slug, module: CusModule }, idx) => {
+            console.log('eeee', slug, module)
+            return (
+              <div key={idx}>
+                <Link href={`/blog/${slug}`}>
+                  <h3>{slug}</h3>
+                </Link>
+                {/* <CusModule /> */}
+              </div>
+            )
+          })}
+        </div>
       </section>
     </Layout>
   );
 }
 
+Blog.layoutProps = {
+  meta: {
+    title: 'Blog',
+    description: 'All the latest Tailwind CSS news, straight from the team.',
+  },
+}
+
 export const getStaticProps: GetStaticProps = async () => {
   const allPostsData = getSortedPostsData();
-  const posts = getAllPostPreviews();
-  console.log("qqqq", posts);
+  // const posts = getAllPostPreviews()
+  // console.log("lllll", posts);
   return {
     props: {
       allPostsData,
+      // posts
     },
   };
 };

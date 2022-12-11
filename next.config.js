@@ -94,7 +94,6 @@ module.exports = {
       use: [
         options.defaultLoaders.babel,
         createLoader(function (src) {
-          console.log("createLoader-------", src);
           const [preview] = src.split("<!--/excerpt-->");
           return preview.replace("<!--excerpt-->", "");
         }),

@@ -116,36 +116,32 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
         ## Creating your project
 
         Start by creating a new ${tool} project if you don't have one set up already.
-        ${
-          reference !== null
-            ? `The most common approach is to use [${reference.name}](${reference.link}):`
-            : ""
+        ${reference !== null
+          ? `The most common approach is to use [${reference.name}](${reference.link}):`
+          : ""
         }
 
 
         ${disclaimer !== null ? code("shell", `${script} my-project`) : ""}
         ${disclaimer !== null ? disclaimer : ""}
 
-        ${
-          disclaimer !== null
-            ? "Next, change directories to your new project:"
-            : ""
+        ${disclaimer !== null
+          ? "Next, change directories to your new project:"
+          : ""
         }
         ${disclaimer !== null ? code("shell", "cd my-project") : ""}
 
-        ${
-          disclaimer === null
-            ? code(
-                "shell",
-                [`${script} my-project`, "cd my-project"].join("\n")
-              )
-            : ""
+        ${disclaimer === null
+          ? code(
+            "shell",
+            [`${script} my-project`, "cd my-project"].join("\n")
+          )
+          : ""
         }
 
-        ${
-          npmInstall
-            ? `Next, install ${tool}'s front-end dependencies using \`npm\`:`
-            : ""
+        ${npmInstall
+          ? `Next, install ${tool}'s front-end dependencies using \`npm\`:`
+          : ""
         }
         ${npmInstall ? code("shell", "npm install") : ""}
       `);
@@ -164,14 +160,12 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
       return md(`
         ### Create your configuration ${multipleFiles ? "files" : "file"}
 
-        Next, generate your ${joinAsSpeech(files)} ${
-        multipleFiles ? "files" : "file"
-      }:
+        Next, generate your ${joinAsSpeech(files)} ${multipleFiles ? "files" : "file"
+        }:
 
         ${code(
           "shell",
-          `npx tailwindcss${version === "compat-7" ? "-cli@latest" : ""} init ${
-            postcss ? "-p" : ""
+          `npx tailwindcss${version === "compat-7" ? "-cli@latest" : ""} init ${postcss ? "-p" : ""
           }`
         )}
 
@@ -181,20 +175,17 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
 
         Learn more about configuring Tailwind in the [configuration documentation](/docs/configuration).
 
-        ${
-          postcss
-            ? "It will also create a `postcss.config.js` file that includes `tailwindcss` and `autoprefixer` already configured:"
-            : ""
+        ${postcss
+          ? "It will also create a `postcss.config.js` file that includes `tailwindcss` and `autoprefixer` already configured:"
+          : ""
         }
-        ${
-          postcss
-            ? code("js", stubs.postcss, { file: "postcss.config.js" })
-            : ""
+        ${postcss
+          ? code("js", stubs.postcss, { file: "postcss.config.js" })
+          : ""
         }
-        ${
-          postcss
-            ? "If you're planning to use any other PostCSS plugins, you should read our documentation on [using PostCSS as your preprocessor](/docs/using-with-preprocessors) for more details about the best way to order them alongside Tailwind."
-            : ""
+        ${postcss
+          ? "If you're planning to use any other PostCSS plugins, you should read our documentation on [using PostCSS as your preprocessor](/docs/using-with-preprocessors) for more details about the best way to order them alongside Tailwind."
+          : ""
         }
 
         ### Configure Tailwind to remove unused styles in production
@@ -208,14 +199,13 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
           diff(stubs.tailwind, [
             [
               "purge: [],",
-              `purge: [${
-                purge.length > 2
-                  ? // Use multiple lines once we hit 3 lines of purging
-                    "\n" +
-                    purge.map(quote("'")).map(indent(2)).join(",\n") +
-                    ",\n"
-                  : // Keep it all inline
-                    purge.map(quote("'")).join(", ")
+              `purge: [${purge.length > 2
+                ? // Use multiple lines once we hit 3 lines of purging
+                "\n" +
+                purge.map(quote("'")).map(indent(2)).join(",\n") +
+                ",\n"
+                : // Keep it all inline
+                purge.map(quote("'")).join(", ")
               }],`,
             ],
           ]),
@@ -274,11 +264,9 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
         .filter(Boolean);
       let information =
         outdatedVersions.length > 0
-          ? `${joinAsSpeech(outdatedVersions)} ${
-              outdatedVersions.length === 1 ? "doesn't" : "don't"
-            } support PostCSS 8 yet${
-              soon ? " _(but it's coming soon)_" : ""
-            } so you need to install [the Tailwind CSS v2.0 PostCSS 7 compatibility build](/docs/installation#post-css-7-compatibility-build) for now as we've shown above.`
+          ? `${joinAsSpeech(outdatedVersions)} ${outdatedVersions.length === 1 ? "doesn't" : "don't"
+          } support PostCSS 8 yet${soon ? " _(but it's coming soon)_" : ""
+          } so you need to install [the Tailwind CSS v2.0 PostCSS 7 compatibility build](/docs/installation#post-css-7-compatibility-build) for now as we've shown above.`
           : "";
 
       return md(`
@@ -288,25 +276,22 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
 
         ### Install Tailwind via npm
 
-        ${
-          uninstall.length > 0
-            ? `If you already have the ${joinAsSpeech(
-                uninstall.map(quote("`"))
-              )} ${
-                uninstall.length === 1 ? "module" : "modules"
-              } installed for any reason, it's important that you uninstall it before installing Tailwind itself:`
-            : ""
+        ${uninstall.length > 0
+          ? `If you already have the ${joinAsSpeech(
+            uninstall.map(quote("`"))
+          )} ${uninstall.length === 1 ? "module" : "modules"
+          } installed for any reason, it's important that you uninstall it before installing Tailwind itself:`
+          : ""
         }
-        ${
-          uninstall.length > 0
-            ? code("shell", `npm uninstall ${uninstall.join(" ")}`)
-            : ""
+        ${uninstall.length > 0
+          ? code("shell", `npm uninstall ${uninstall.join(" ")}`)
+          : ""
         }
 
         ${uninstall.length > 0 ? "Next, install" : "Install"} ${joinAsSpeech(
-        [...dependencies.map(quote("`")), "Tailwind"],
-        " as well as "
-      )} and its peer-dependencies using \`npm\`:
+          [...dependencies.map(quote("`")), "Tailwind"],
+          " as well as "
+        )} and its peer-dependencies using \`npm\`:
 
         ${code("shell", installCode)}
 
@@ -323,10 +308,9 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
       return md(`
         ${"#".repeat(level)} Include Tailwind in your CSS
 
-        ${
-          create
-            ? `Create the \`${file}\` file`
-            : `Open the \`${file}\` file that ${tool} generates for you by default`
+        ${create
+          ? `Create the \`${file}\` file`
+          : `Open the \`${file}\` file that ${tool} generates for you by default`
         }
         and use the \`@tailwind\` directive to include Tailwind's \`base\`, \`components\`, and \`utilities\` styles, replacing the original file contents:
 
@@ -341,10 +325,9 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
           { file }
         )}
 
-        ${
-          withChromiumBug
-            ? "_Due to [a bug in Chromium](https://bugs.chromium.org/p/chromium/issues/detail?id=1131113), it's important that you include the weird `/*! @import */` comment to avoid performance issues in Chrome DevTools during development. This is already fixed in Canary but hasn't been released generally yet._"
-            : ""
+        ${withChromiumBug
+          ? "_Due to [a bug in Chromium](https://bugs.chromium.org/p/chromium/issues/detail?id=1131113), it's important that you include the weird `/*! @import */` comment to avoid performance issues in Chrome DevTools during development. This is already fixed in Canary but hasn't been released generally yet._"
+          : ""
         }
 
         Tailwind will swap these directives out at build-time with all of the styles it generates based on your configured design system.
@@ -355,9 +338,9 @@ function createPrevals({ tool: pageTool = error("UNKNOWN") } = {}) {
     finish({ scripts = [], tool = pageTool }) {
       return md(`
         You're finished! Now when you run ${joinAsSpeech(
-          scripts.map(quote("`")),
-          " or "
-        )}, Tailwind CSS will be ready to use in your ${tool} project.
+        scripts.map(quote("`")),
+        " or "
+      )}, Tailwind CSS will be ready to use in your ${tool} project.
 
         [Next learn about the utility-first workflow &rarr;](/docs/utility-first)
       `);
@@ -404,6 +387,9 @@ module.exports.withPrevalInstructions = () => {
     let prevals = createPrevals(context);
 
     visit(tree, "code", (node, index, parent) => {
+      // 进来的都是```  ``` 的代码片断
+      // 例： ```jsx```, node.lang 就是jsx
+      // 例： ```js```, node.lang 就是js
       if (node.lang !== "preval") return;
       if (prevals[node.meta] === undefined)
         throw new Error(
