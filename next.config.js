@@ -39,6 +39,50 @@ module.exports = {
     esmExternals: false,
   },
   webpack(config, options) {
+    config.resolve.alias['defaultConfig$'] = require.resolve('tailwindcss/defaultConfig')
+    config.module.rules.push({
+      test: require.resolve('tailwindcss/defaultConfig'),
+      use: createLoader(function (_source) {
+        return `export default ${JSON.stringify(defaultConfig)}`
+      }),
+    })
+
+    config.resolve.alias['utilities$'] = require.resolve('tailwindcss/lib/corePlugins.js')
+
+    // import utilities from 'utilities?plugin=backgroundColor'
+    config.module.rules.push({
+      resourceQuery: /plugin/,
+      test: require.resolve('tailwindcss/lib/corePlugins.js'),
+      use: createLoader(function (_source) {
+        let pluginName = new URLSearchParams(this.resourceQuery).get('plugin')
+        let plugin = require('tailwindcss/lib/corePlugins.js').corePlugins[pluginName]
+        return `export default ${JSON.stringify(getUtilities(plugin))}`
+      }),
+    })
+
+    config.module.rules.push({
+      resourceQuery: /examples/,
+      test: require.resolve('tailwindcss/lib/corePlugins.js'),
+      use: createLoader(function (_source) {
+        let plugins = require('tailwindcss/lib/corePlugins.js').corePlugins
+        let examples = Object.entries(plugins).map(([name, plugin]) => {
+          let utilities = getUtilities(plugin)
+          return {
+            plugin: name,
+            example:
+              Object.keys(utilities).length > 0
+                ? Object.keys(utilities)
+                    [Math.floor((Object.keys(utilities).length - 1) / 2)].split(/[>:]/)[0]
+                    .trim()
+                    .substr(1)
+                    .replace(/\\/g, '')
+                : undefined,
+          }
+        })
+        return `export default ${JSON.stringify(examples)}`
+      }),
+    })
+
     let mdx = (plugins = []) => [
       {
         loader: '@mdx-js/loader',

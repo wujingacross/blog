@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import Header from '../Header'
+import Header from '../headers/Header'
 import styles from './index.module.css'
 
 const name = 'WJ'
