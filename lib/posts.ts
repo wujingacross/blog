@@ -1,45 +1,45 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { remark } from "remark";
+import fs from 'fs'
+import path from 'path'
+import matter from 'gray-matter'
+// import { remark } from 'remark'
 // import html from "remark-html";
 
-const postsDirectory = path.join(process.cwd(), "posts");
+const postsDirectory = path.join(process.cwd(), 'posts')
 
 export function getSortedPostsData() {
   // Get file names under /posts
-  const fileNames = fs.readdirSync(postsDirectory);
+  const fileNames = fs.readdirSync(postsDirectory)
   const allPostsData = fileNames.map((fileName) => {
     // Remove ".md" from file name to get id
-    const id = fileName.replace(/\.md$/, "");
+    const id = fileName.replace(/\.md$/, '')
 
     // Read markdown file as string
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const fullPath = path.join(postsDirectory, fileName)
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
 
     // Use gray-matter to parse the post metadata section
-    const matterResult = matter(fileContents);
+    const matterResult = matter(fileContents)
 
     // Combine the data with the id
     return {
       id,
       ...(matterResult.data as { date: string; title: string }),
-    };
-  });
+    }
+  })
   // Sort posts by date
   return allPostsData.sort(({ date: a }, { date: b }) => {
     if (a < b) {
-      return 1;
+      return 1
     } else if (a > b) {
-      return -1;
+      return -1
     } else {
-      return 0;
+      return 0
     }
-  });
+  })
 }
 
 export function getAllPostIds() {
-  const fileNames = fs.readdirSync(postsDirectory);
+  const fileNames = fs.readdirSync(postsDirectory)
 
   // Returns an array that looks like this:
   // [
@@ -57,19 +57,20 @@ export function getAllPostIds() {
   return fileNames.map((fileName) => {
     return {
       params: {
-        id: fileName.replace(/\.md$/, ""),
+        id: fileName.replace(/\.md$/, ''),
       },
-    };
-  });
+    }
+  })
 }
 
 export async function getPostData(id) {
-  const fullPath = path.join(postsDirectory, `${id}.md`);
-  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const fullPath = path.join(postsDirectory, `${id}.md`)
+  const fileContents = fs.readFileSync(fullPath, 'utf8')
 
   // Use gray-matter to parse the post metadata section
-  const matterResult = matter(fileContents);
+  const matterResult = matter(fileContents)
 
+  // 与 mdx所需库 会产生 unified的版本冲突
   // Use remark to convert markdown into HTML string
   // const processedContent = await remark()
   //   .use(html)
@@ -79,44 +80,7 @@ export async function getPostData(id) {
   // Combine the data with the id and contentHtml
   return {
     id,
-    contentHtml: "",
+    contentHtml: '',
     ...(matterResult.data as { date: string; title: string }),
-  };
-}
-
-// /************ */
-// function importAll(r) {
-//   return r
-//     .keys()
-//     .filter((filename) => filename.startsWith("."))
-//     .map((filename) => ({
-//       slug: filename.substr(2).replace(/\/index\.mdx$/, ""),
-//       filename,
-//       module: r(filename),
-//     }))
-//     .filter(({ slug }) => !slug.includes("/snippets/"))
-//     .filter((p) => p.module.meta.private !== true)
-//     .sort((a, b) => dateSortDesc(a.module.meta.date, b.module.meta.date));
-// }
-
-// function dateSortDesc(a, b) {
-//   if (a > b) return -1;
-//   if (a < b) return 1;
-//   return 0;
-// }
-
-export function getAllPostPreviews() {
-  const files = require.context("../pages", false, /\.mdx$/);
-  console.log("ttttttt", files, files[0]);
-  files
-    .keys()
-    .filter((filename) => filename.startsWith("."))
-    .map((filename) => ({
-      slug: filename.substr(2).replace(/\.mdx$/, ""),
-      filename,
-      f: filename.substr(2),
-      module: files[filename.substr(2)],
-    }))
-    .forEach((item) => console.log("item", item));
-  // return importAll(require.context("../pages/blog/?preview", true, /\.mdx$/));
+  }
 }

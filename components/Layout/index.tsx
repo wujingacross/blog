@@ -1,27 +1,18 @@
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import Header from "../Header";
-import styles from "./index.module.css";
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import Header from '../Header'
+import styles from './index.module.css'
 
-const name = "WJ";
-export const siteTitle = "WJ's Sample Website";
+const name = 'WJ'
+export const siteTitle = "WJ's Sample Website"
 
-export default function Layout({
-  children,
-  home,
-}: {
-  children: React.ReactNode;
-  home?: boolean;
-}) {
+export default function Layout({ children, home }: { children: React.ReactNode; home?: boolean }) {
   return (
     <div className={styles.container}>
       <Head>
         <link rel="icon" href="/favicon.ico" />
-        <meta
-          name="description"
-          content="Learn how to build a personal website using Next.js"
-        />
+        <meta name="description" content="Learn how to build a personal website using Next.js" />
         <meta
           property="og:image"
           content={`https://og-image.vercel.app/${encodeURI(
@@ -32,12 +23,12 @@ export default function Layout({
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <Header />
-      <main> {children}</main>
+      <main>{children}</main>
       {!home && (
         <div className={styles.backToHome}>
           <Link href="/">← Back to home</Link>
         </div>
       )}
     </div>
-  );
+  )
 }

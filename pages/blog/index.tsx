@@ -1,17 +1,13 @@
-import { GetStaticProps } from "next";
-import Link from "next/link";
-import { getSortedPostsData } from "lib/posts";
-import { getAllPostPreviews } from "lib/getAllPosts";
-import Layout from "components/Layout";
-import { Widont } from "components/Widont";
-import Date from "components/DateN";
+import Link from 'next/link'
+import clsx from 'clsx'
+import Layout from 'components/Layout'
+import { Widont } from 'components/Widont'
+import { getAllPostPreviews } from 'lib/getAllPosts'
+import { formatDate } from 'lib/utils/formatDate'
 
 const posts = getAllPostPreviews()
-console.log('dddddd3', posts)
 
-export default function Blog({ allPostsData }) {
-  console.log("allPostsData: ", allPostsData);
-
+export default function Blog() {
   return (
     <Layout>
       <main>
@@ -20,50 +16,76 @@ export default function Blog({ allPostsData }) {
             Latest Updates
           </h1>
           <p className="text-lg text-slate-700 dark:text-slate-400">
-            <Widont>
-              All the latest Tailwind CSS news, straight from the team.
-            </Widont>
+            <Widont>All the latest Tailwind CSS news, straight from the team.</Widont>
           </p>
         </header>
+        <section className="relative sm:pb-12 sm:ml-[calc(2rem+1px)] md:ml-[calc(3.5rem+1px)] lg:ml-[max(calc(14.5rem+1px),calc(100%-48rem))]">
+          <div className="hidden absolute top-3 bottom-0 right-full mr-7 md:mr-[3.25rem] w-px bg-slate-200 dark:bg-slate-800 sm:block" />
+          <div className="space-y-16">
+            {posts.map(({ slug, module: { default: Component, meta } }) => {
+              return (
+                <article key={slug} className="relative group">
+                  <div className="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl group-hover:bg-slate-50/70 dark:group-hover:bg-slate-800/50" />
+                  <svg
+                    viewBox="0 0 9 9"
+                    className="hidden absolute right-full mr-6 top-2 text-slate-200 dark:text-slate-600 md:mr-12 w-[calc(0.5rem+1px)] h-[calc(0.5rem+1px)] overflow-visible sm:block"
+                  >
+                    <circle
+                      cx="4.5"
+                      cy="4.5"
+                      r="4.5"
+                      stroke="currentColor"
+                      className="fill-white dark:fill-slate-900"
+                      strokeWidth={2}
+                    />
+                  </svg>
+                  <div className="relative">
+                    <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-200 pt-8 lg:pt-0">
+                      {meta.title}
+                    </h3>
+                    <div className="mt-2 mb-4 prose prose-slate prose-a:relative prose-a:z-10 dark:prose-dark line-clamp-2">
+                      <Component />
+                    </div>
+                    <dl className="absolute left-0 top-0 lg:left-auto lg:right-full lg:mr-[calc(6.5rem+1px)]">
+                      <dt className="sr-only">Date</dt>
+                      <dd
+                        className={clsx('whitespace-nowrap text-sm leading-6 dark:text-slate-400')}
+                      >
+                        <time dateTime={meta.date}>
+                          {formatDate(meta.date, '{MMMM} {DD}, {YYYY}')}
+                        </time>
+                      </dd>
+                    </dl>
+                  </div>
+                  <Link href={`/blog/${slug}`}>
+                    <a className="flex items-center text-sm text-sky-500 font-medium">
+                      <span className="absolute -inset-y-2.5 -inset-x-4 md:-inset-y-4 md:-inset-x-6 sm:rounded-2xl" />
+                      <span className="relative">
+                        Read more<span className="sr-only">, {meta.title}</span>
+                      </span>
+                      <svg
+                        className="relative mt-px overflow-visible ml-2.5 text-sky-300 dark:text-sky-700"
+                        width="3"
+                        height="6"
+                        viewBox="0 0 3 6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M0 0L3 3L0 6"></path>
+                      </svg>
+                    </a>
+                  </Link>
+                </article>
+              )
+            })}
+          </div>
+        </section>
       </main>
-      {/* Add this <section> tag below the existing <section> tag */}
-      <section className="relative">
-        <div className="space-y-16">
-          {allPostsData.map(({ id, date, title }) => (
-            <article key={id} className="relative group">
-              <Link href={`/posts/${id}`}>{title}</Link>
-              <br />
-              <small>
-                <Date dateString={date} />
-              </small>
-              <div className="relative">
-                <h3 className="text-base font-semibold tracking-tight text-slate-900 pt-8 lg:pt-0 dark:text-slate-200">
-                  {title}
-                </h3>
-                <div className="mt-2 mb-4">
-                  <Date dateString={date} />
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="space-y-16">
-          {posts.map(({ slug, module: CusModule }, idx) => {
-            console.log('eeee', slug, module)
-            return (
-              <div key={idx}>
-                <Link href={`/blog/${slug}`}>
-                  <h3>{slug}</h3>
-                </Link>
-                {/* <CusModule /> */}
-              </div>
-            )
-          })}
-        </div>
-      </section>
     </Layout>
-  );
+  )
 }
 
 Blog.layoutProps = {
@@ -72,15 +94,3 @@ Blog.layoutProps = {
     description: 'All the latest Tailwind CSS news, straight from the team.',
   },
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = getSortedPostsData();
-  // const posts = getAllPostPreviews()
-  // console.log("lllll", posts);
-  return {
-    props: {
-      allPostsData,
-      // posts
-    },
-  };
-};
