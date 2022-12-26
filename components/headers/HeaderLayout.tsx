@@ -49,7 +49,7 @@ export default function Header() {
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
-      window.removeEventListener('scroll', onScroll, { passive: true })
+      window.removeEventListener('scroll', onScroll)
     }
   }, [isOpaque])
 
