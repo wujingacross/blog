@@ -85,7 +85,7 @@ export default function Blog() {
 
 Blog.layoutProps = {
   meta: {
-    title: 'Blog',
+    title: 'Blog A',
     description: 'All the latest Tailwind CSS news, straight from the team.',
   },
 }
