@@ -1,7 +1,7 @@
-import { useEffect, useContext, useRef } from "react";
-import { ContentsContext } from "layouts/ContentsLayout";
-import { useTop } from "hooks/useTop";
-import clsx from "clsx";
+import { useEffect, useContext, useRef } from 'react'
+import { ContentsContext } from 'layouts/ContentsLayout'
+import { useTop } from 'hooks/useTop'
+import clsx from 'clsx'
 
 export function Heading({
   level,
@@ -9,42 +9,41 @@ export function Heading({
   children,
   number,
   badge,
-  className = "",
+  className = '',
   hidden = false,
   ignore = false,
   style = {},
   nextElement,
   ...props
 }) {
-  let Component = `h${level}`;
-  const context = useContext(ContentsContext);
+  let Component = `h${level}`
+  const context = useContext(ContentsContext)
 
-  let ref = useRef();
-  let top = useTop(ref);
+  let ref = useRef()
+  let top = useTop(ref)
 
   useEffect(() => {
-    if (!context) return;
-    if (typeof top !== "undefined") {
-      context.registerHeading(id, top);
+    if (!context) return
+    if (typeof top !== 'undefined') {
+      context.registerHeading(id, top)
     }
     return () => {
-      context.unregisterHeading(id);
-    };
-  }, [top, id, context?.registerHeading, context?.unregisterHeading]);
+      context.unregisterHeading(id)
+    }
+    // eslint-disable-next-line
+  }, [top, id, context?.registerHeading, context?.unregisterHeading])
 
   return (
     <Component
-      className={clsx("group flex whitespace-pre-wrap", className, {
-        "-ml-4 pl-4": !hidden,
-        "mb-2 text-sm leading-6 text-sky-500 font-semibold tracking-normal dark:text-sky-400":
-          level === 2 &&
-          nextElement?.type === "heading" &&
-          nextElement?.depth === 3,
+      className={clsx('group flex whitespace-pre-wrap', className, {
+        '-ml-4 pl-4': !hidden,
+        'mb-2 text-sm leading-6 text-sky-500 font-semibold tracking-normal dark:text-sky-400':
+          level === 2 && nextElement?.type === 'heading' && nextElement?.depth === 3,
       })}
       id={id}
       ref={ref}
       style={{ ...(hidden ? { marginBottom: 0 } : {}), ...style }}
-      data-docsearch-ignore={ignore ? "" : undefined}
+      data-docsearch-ignore={ignore ? '' : undefined}
       {...props}
     >
       {!hidden && (
@@ -71,12 +70,12 @@ export function Heading({
           {number}
         </span>
       )}
-      <span className={hidden ? "sr-only" : undefined}>{children}</span>
+      <span className={hidden ? 'sr-only' : undefined}>{children}</span>
       {badge && (
         <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium leading-4 bg-green-150 text-green-900">
           {badge}
         </span>
       )}
     </Component>
-  );
+  )
 }

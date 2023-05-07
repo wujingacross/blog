@@ -9,8 +9,9 @@ export default function Hero() {
           <div className="">
             <div>img</div>
             <div>
-              “Tailwind CSS is the only framework that I've seen scale on large teams. It’s easy to
-              customize, adapts to any design, and the build size is tiny.”
+              {/* `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  */}
+              “Tailwind CSS is the only framework that I&apos;ve seen scale on large teams.
+              It&rsquo;s easy to customize, adapts to any design, and the build size is tiny.”
             </div>
             <div>Sarah Dayan</div>
             <div>Staff Engineer, Algolia</div>
