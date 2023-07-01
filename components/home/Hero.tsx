@@ -1,6 +1,98 @@
 import React, { useRef } from 'react'
 import { AnimateSharedLayout, motion, useAnimation } from 'framer-motion'
 import { fit } from 'utils/fit'
+import { CodeWindow, Token } from 'components/codeWindow'
+import { tokens, code } from '../../samples/hero.html?highlight'
+
+console.log('dddddd', code, tokens)
+
+function getRange(text, options = {}) {
+  return { start: code.indexOf(text), end: code.indexOf(text) + text.length, ...options }
+}
+
+const ranges = [
+  getRange(' p-8'),
+  getRange(' rounded-full'),
+  getRange(' mx-auto'),
+  getRange(' font-medium'),
+  getRange(' class="font-medium"'),
+  getRange(' class="text-sky-500 dark:text-sky-400"'),
+  getRange(' class="text-slate-700 dark:text-slate-500"'),
+  getRange(' text-center'),
+  getRange('md:flex '),
+  getRange(' md:p-0'),
+  getRange(' md:p-8', { immediate: true }),
+  getRange(' md:rounded-none'),
+  getRange(' md:w-48'),
+  getRange(' md:h-auto'),
+  getRange(' md:text-left'),
+]
+
+function getRangeIndex(index, ranges) {
+  for (let i = 0; i < ranges.length; i++) {
+    const rangeArr = Array.isArray(ranges[i]) ? ranges[i] : [ranges[i]]
+    for (let j = 0; j < rangeArr.length; j++) {
+      if (index >= rangeArr[j].start && index < rangeArr[j].end) {
+        return [i, index - rangeArr[j].start, index === rangeArr[j].end - 1]
+      }
+    }
+  }
+  return [-1]
+}
+
+function augment(tokens, index = 0) {
+  for (let i = 0; i < tokens.length; i++) {
+    if (Array.isArray(tokens[i])) {
+      const _type = tokens[i][0]
+      const children = tokens[i][1]
+      if (Array.isArray(children)) {
+        index = augment(children, index)
+      } else {
+        const str = children
+        const result = []
+        for (let j = 0; j < str.length; j++) {
+          const [rangeIndex, indexInRange, isLast] = getRangeIndex(index, ranges)
+          if (rangeIndex > -1) {
+            result.push([`char:${rangeIndex}:${indexInRange}${isLast ? ':last' : ''}`, str[j]])
+          } else {
+            if (typeof result[result.length - 1] === 'string') {
+              result[result.length - 1] += str[j]
+            } else {
+              result.push(str[j])
+            }
+          }
+          index++
+        }
+        if (!(result.length === 1 && typeof result[0] === 'string')) {
+          tokens[i].splice(1, 1, result)
+        }
+      }
+    } else {
+      const str = tokens[i]
+      const result = []
+      for (let j = 0; j < str.length; j++) {
+        const [rangeIndex, indexInRange, isLast] = getRangeIndex(index, ranges)
+        if (rangeIndex > -1) {
+          result.push([`char:${rangeIndex}:${indexInRange}${isLast ? ':last' : ''}`, str[j]])
+        } else {
+          if (typeof result[result.length - 1] === 'string') {
+            result[result.length - 1] += str[j]
+          } else {
+            result.push(str[j])
+          }
+        }
+        index++
+      }
+      tokens.splice(i, 1, ...result)
+      i += result.length - 1
+    }
+  }
+  return index
+}
+
+augment(tokens)
+
+console.log('ssswwwww', tokens)
 
 export default function Hero() {
   const containerRef = useRef()
@@ -46,14 +138,46 @@ export default function Hero() {
           </AnimateSharedLayout>
         </div>
       }
-      right={<div>code</div>}
+      right={
+        <CodeWindow className="!h-auto max-h-[none]">
+          <CodeWindow.Code tokens={tokens} tokenComponent={HeroToken} />
+        </CodeWindow>
+      }
     ></Layout>
   )
 }
 
+function AnimatedToken({ isActiveToken, onComplete }) {
+  return <></>
+}
+
+function HeroToken({ currentChar, onCharComplete, currentGroup, onGroupComplete, ...props }) {
+  const { token } = props
+
+  if (token[0].startsWith('char:')) {
+    const [, groupIndex, indexInGroup] = token[0].split(':').map((x) => parseInt(x, 10))
+
+    return (
+      <AnimatedToken
+        isActiveToken={currentGroup === groupIndex && currentChar === indexInGroup}
+        onComplete={() => {
+          if (token[0].endsWith(':last')) {
+            onGroupComplete(groupIndex)
+          } else {
+            onCharComplete(indexInGroup)
+          }
+        }}
+        {...props}
+      />
+    )
+  }
+
+  return <Token {...props} />
+}
+
 function Layout({ left, right }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8  mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center">
       <div className="relative row-start-1 col-start-1 col-span-5 xl:col-span-6 -mt-10">
         <div className="h-[24.25rem] max-w-xl mx-auto lg:max-w-none flex items-center justify-center">
           <div className="w-full flex-none">{left}</div>

@@ -5,12 +5,13 @@ const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenCo
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx}',
     './remark/**/*.{js,ts}',
-    './layouts/**/*.{js,ts}'
+    './layouts/**/*.{js,ts}',
+    './samples/**/*.{js,ts,html}',
   ],
-  darkMode: "class",
+  darkMode: 'class',
   theme: {
     // // `demo-*` screens are used for the "mobile-first" responsive demo
     screens: {
@@ -193,7 +194,7 @@ module.exports = {
             'figure > figcaption': {
               marginTop: `${12 / 14}em`,
             },
-          }
+          },
         },
         dark: {
           css: {
@@ -347,4 +348,4 @@ module.exports = {
       })
     },
   ],
-};
+}
