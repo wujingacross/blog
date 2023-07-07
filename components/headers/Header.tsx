@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ThemeToggle } from 'components/headers/ThemeToggle'
 import Hero from 'components/home/Hero'
+import styles from './Header.module.css'
+import clsx from 'clsx'
 
 export function NavItems() {
   return (
@@ -31,6 +33,23 @@ export function NavItems() {
     </>
   )
 }
+
+const HeaderBg = () => (
+  <div
+    className={clsx(
+      'absolute inset-0 bottom-10 bg-bottom bg-no-repeat bg-slate-50 dark:bg-[#0B1120]',
+      styles.beams
+    )}
+  >
+    <div
+      className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom dark:border-b dark:border-slate-100/5"
+      style={{
+        maskImage: 'linear-gradient(to bottom, transparent, black)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent, black)',
+      }}
+    />
+  </div>
+)
 
 const TopMenuBar = () => (
   <div className="relative pt-6 lg:pt-8 font-semibold text-sm leading-6 text-slate-700 dark:text-slate-200">
@@ -74,7 +93,11 @@ export default function Header() {
   return (
     <header className="relative">
       <div className="px-4 sm:px-6 md:px-8">
+        {/* 背景 */}
+        <HeaderBg />
+        {/* 顶部导航栏 */}
         <TopMenuBar />
+        {/* 网站标题 */}
         <Title />
       </div>
       <Hero />

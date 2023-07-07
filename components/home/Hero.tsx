@@ -1,10 +1,9 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { AnimateSharedLayout, motion, useAnimation } from 'framer-motion'
 import { fit } from 'utils/fit'
+import { createInViewPromise } from 'utils/createInViewPromise'
 import { CodeWindow, Token } from 'components/codeWindow'
 import { tokens, code } from '../../samples/hero.html?highlight'
-
-console.log('dddddd', code, tokens)
 
 function getRange(text, options = {}) {
   return { start: code.indexOf(text), end: code.indexOf(text) + text.length, ...options }
@@ -38,6 +37,16 @@ function getRangeIndex(index, ranges) {
     }
   }
   return [-1]
+}
+
+function Words({ children, bolder = false }) {
+  return children.split(' ').map((word, i) => {
+    return (
+      <span key={i} className="relative inline-flex whitespace-pre text-lg">
+        {bolder ? <span className="absolute top-0 left-0">{`${word} `}</span> : `${word} `}
+      </span>
+    )
+  })
 }
 
 function augment(tokens, index = 0) {
@@ -92,55 +101,81 @@ function augment(tokens, index = 0) {
 
 augment(tokens)
 
-console.log('ssswwwww', tokens)
-
 export default function Hero() {
+  const mounted = useRef(true) // 标记页面是否加载过
+  const [step, setStep] = useState(-1) // 第几步
+  const inViewRef = useRef() // 进入可视区
   const containerRef = useRef()
   const imageRef = useRef()
+
+  console.log('www', mounted.current)
+
+  useEffect(() => {
+    return () => {
+      mounted.current = false
+      console.log('eeee', mounted.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log('wwqqq', inViewRef.current)
+    const { promise: inViewPromise, disconnect } = createInViewPromise(inViewRef.current, {
+      threshold: 0.5,
+    })
+  }, [])
 
   return (
     <Layout
       left={
         <div ref={containerRef} className="lg:-mr-18">
           <AnimateSharedLayout>
-            <div className="">
-              <div>
-                <motion.img
-                  ref={imageRef}
-                  // layout={layout}
-                  // transition={TRANSITION}
-                  src={require('img/sarah-dayan.jpg').default.src}
-                  decoding="async"
-                  alt=""
-                  // className={clsx('absolute max-w-none object-cover bg-slate-100', {
-                  //   'rounded-full': finished && !md,
-                  // })}
-                  // style={
-                  //   finished
-                  //     ? { top: 0, left: 0, width: '100%', height: '100%' }
-                  //     : step >= 13 && md
-                  //     ? fit(192, containerRect.height, 384, 512)
-                  //     : step >= 12 && md
-                  //     ? fit(192, 96, 384, 512)
-                  //     : fit(96, 96, 384, 512)
-                  // }
-                  style={fit(96, 96, 384, 512)}
-                />
+            <div className="relative z-10 rounded-lg shadow-xl text-slate-900 dark:text-slate-300 mx-auto sm:w-[23.4375rem]">
+              <div className="bg-white rounded-lg overflow-hidden ring-1 ring-slate-900/5 dark:bg-slate-800 dark:highlight-white/5 dark:ring-0">
+                <div>
+                  <motion.img
+                    ref={imageRef}
+                    // layout={layout}
+                    // transition={TRANSITION}
+                    src={require('img/sarah-dayan.jpg').default.src}
+                    decoding="async"
+                    alt=""
+                    // className={clsx('absolute max-w-none object-cover bg-slate-100', {
+                    //   'rounded-full': finished && !md,
+                    // })}
+                    // style={
+                    //   finished
+                    //     ? { top: 0, left: 0, width: '100%', height: '100%' }
+                    //     : step >= 13 && md
+                    //     ? fit(192, containerRect.height, 384, 512)
+                    //     : step >= 12 && md
+                    //     ? fit(192, 96, 384, 512)
+                    //     : fit(96, 96, 384, 512)
+                    // }
+                    style={fit(96, 96, 384, 512)}
+                  />
+                </div>
+                <div>
+                  <div className="mb-4">
+                    <Words>
+                      {/* `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  */}
+                      “Tailwind CSS is the only framework that I&apos;ve seen scale on large teams.
+                      It&rsquo;s easy to customize, adapts to any design, and the build size is
+                      tiny.”
+                    </Words>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <p>Sarah Dayan</p>
+                  <p>Staff Engineer, Algolia</p>
+                </div>
               </div>
-              <div>
-                {/* `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  */}
-                “Tailwind CSS is the only framework that I&apos;ve seen scale on large teams.
-                It&rsquo;s easy to customize, adapts to any design, and the build size is tiny.”
-              </div>
-              <div>Sarah Dayan</div>
-              <div>Staff Engineer, Algolia</div>
             </div>
           </AnimateSharedLayout>
         </div>
       }
       right={
         <CodeWindow className="!h-auto max-h-[none]">
-          <CodeWindow.Code tokens={tokens} tokenComponent={HeroToken} />
+          <CodeWindow.Code ref={inViewRef} tokens={tokens} tokenComponent={HeroToken} />
         </CodeWindow>
       }
     ></Layout>

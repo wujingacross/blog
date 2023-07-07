@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 import clsx from 'clsx'
 export * from './Code'
 import { Code } from './Code'
@@ -26,7 +26,7 @@ export const CodeWindow = ({ children, className, border = true }) => {
 }
 
 // eslint-disable-next-line react/display-name
-CodeWindow.Code = ({ tokens, initialLineNumber = 1, ...props }) => {
+CodeWindow.Code = forwardRef(({ tokens, initialLineNumber = 1, ...props }, ref) => {
   const lineNumbers = useMemo(() => {
     const t = tokens.flat(Infinity)
     let line = initialLineNumber + 1
@@ -45,7 +45,7 @@ CodeWindow.Code = ({ tokens, initialLineNumber = 1, ...props }) => {
   }, [tokens])
 
   return (
-    <div>
+    <div ref={ref}>
       <pre className="flex min-h-full text-sm leading-6">
         <div
           aria-hidden="true"
@@ -60,4 +60,4 @@ CodeWindow.Code = ({ tokens, initialLineNumber = 1, ...props }) => {
       </pre>
     </div>
   )
-}
+})
