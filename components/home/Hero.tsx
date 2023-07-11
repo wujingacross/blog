@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import { AnimateSharedLayout, motion, useAnimation } from 'framer-motion'
 import { fit } from 'utils/fit'
 import { createInViewPromise } from 'utils/createInViewPromise'
+import { wait } from 'utils/wait'
 import { CodeWindow, Token } from 'components/codeWindow'
 import { tokens, code } from '../../samples/hero.html?highlight'
 
@@ -10,21 +11,21 @@ function getRange(text, options = {}) {
 }
 
 const ranges = [
-  getRange(' p-8'),
-  getRange(' rounded-full'),
-  getRange(' mx-auto'),
-  getRange(' font-medium'),
-  getRange(' class="font-medium"'),
-  getRange(' class="text-sky-500 dark:text-sky-400"'),
-  getRange(' class="text-slate-700 dark:text-slate-500"'),
-  getRange(' text-center'),
-  getRange('md:flex '),
-  getRange(' md:p-0'),
-  getRange(' md:p-8', { immediate: true }),
-  getRange(' md:rounded-none'),
-  getRange(' md:w-48'),
-  getRange(' md:h-auto'),
-  getRange(' md:text-left'),
+  getRange(' p-8'), // char:0:0 ' '  char:0:1 'p' char:0:2 '-' char:0:3:last '8'
+  getRange(' rounded-full'), // char:1:0 ' '
+  getRange(' mx-auto'), // char:2:0 ' '
+  getRange(' font-medium'), // char:3:0 ' '
+  getRange(' class="font-medium"'), // char:4:0 ' '
+  getRange(' class="text-sky-500 dark:text-sky-400"'), // char:5:0 ' '
+  getRange(' class="text-slate-700 dark:text-slate-500"'), // char:6:0 ' '
+  getRange(' text-center'), // char:7:0 ' '
+  getRange('md:flex '), // char:8:0 'm'  char:8:1 'd' char:8:2 ':' char:8:3 'f' char:8:4 'l' char:8:5 'e' char:8:6 'x' char:8:7:last ' '
+  getRange(' md:p-0'), // char:9:0 ' '
+  getRange(' md:p-8', { immediate: true }), // char:10:0 ' '
+  getRange(' md:rounded-none'), // char:11:0 ' '
+  getRange(' md:w-48'), // char:12:0 ' '
+  getRange(' md:h-auto'), // char:13:0 ' '
+  getRange(' md:text-left'), // char:14:0 ' '
 ]
 
 function getRangeIndex(index, ranges) {
@@ -102,27 +103,77 @@ function augment(tokens, index = 0) {
 augment(tokens)
 
 export default function Hero() {
-  const mounted = useRef(true) // 标记页面是否加载过
   const [step, setStep] = useState(-1) // 第几步
+  const [state, setState] = useState({ group: -1, char: -1 })
+  const [finished, setFinished] = useState(false)
+
+  const mounted = useRef(true) // 标记组件是否加载
   const inViewRef = useRef() // 进入可视区
   const containerRef = useRef()
   const imageRef = useRef()
 
-  console.log('www', mounted.current)
+  console.log('mounted.current', mounted.current, state.group, state.char)
 
+  // 组件是否加载
   useEffect(() => {
     return () => {
       mounted.current = false
-      console.log('eeee', mounted.current)
     }
   }, [])
 
+  // 监听图片加载、代码区域Dom是否进入到可视区中间
   useEffect(() => {
-    console.log('wwqqq', inViewRef.current)
+    let current = true
+
+    console.log('inViewRef.current=', inViewRef.current)
     const { promise: inViewPromise, disconnect } = createInViewPromise(inViewRef.current, {
       threshold: 0.5,
     })
+
+    const promises = [
+      wait(1000),
+      inViewPromise,
+      new Promise((resolve) => {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(resolve)
+        } else {
+          window.setTimeout(resolve, 0)
+        }
+      }),
+      new Promise((resolve) => {
+        console.log('imageRef.current', imageRef.current, imageRef.current.complete)
+        if (imageRef.current.complete) {
+          resolve()
+        } else {
+          imageRef.current.addEventListener('load', resolve)
+        }
+      }),
+    ]
+
+    Promise.all(promises).then(() => {
+      console.log('Promise.all resolve =======>', current)
+      if (current) {
+        setState({ group: 0, char: 0 })
+      }
+    })
+
+    return () => {
+      current = false
+      disconnect()
+    }
   }, [])
+
+  // 标记动画步骤是否完成
+  useEffect(() => {
+    if (step === 14) {
+      let id = window.setTimeout(() => {
+        setFinished(true)
+      }, 1000)
+      return () => {
+        window.clearTimeout(id)
+      }
+    }
+  }, [step])
 
   return (
     <Layout
@@ -175,22 +226,48 @@ export default function Hero() {
       }
       right={
         <CodeWindow className="!h-auto max-h-[none]">
-          <CodeWindow.Code ref={inViewRef} tokens={tokens} tokenComponent={HeroToken} />
+          <CodeWindow.Code
+            ref={inViewRef}
+            tokens={tokens}
+            tokenComponent={HeroToken}
+            tokenProps={{
+              currentGroup: state.group,
+              currentChar: state.char,
+            }}
+          />
         </CodeWindow>
       }
     ></Layout>
   )
 }
 
-function AnimatedToken({ isActiveToken, onComplete }) {
-  return <></>
+function AnimatedToken({ isActiveToken, onComplete, children }) {
+  const [visible, setVisible] = useState(false)
+
+  console.log('isActiveToken=', isActiveToken)
+
+  useEffect(() => {
+    if (visible) {
+      onComplete()
+    }
+  }, [visible])
+
+  return (
+    <>
+      <span>{children}</span>
+    </>
+  )
 }
 
 function HeroToken({ currentChar, onCharComplete, currentGroup, onGroupComplete, ...props }) {
   const { token } = props
 
   if (token[0].startsWith('char:')) {
+    // console.log('char: =>', token)
     const [, groupIndex, indexInGroup] = token[0].split(':').map((x) => parseInt(x, 10))
+    console.log(
+      `HeroToken-------. currentGroup=${currentGroup}, groupIndex=${groupIndex}, currentChar=${currentChar}, indexInGroup=${indexInGroup}`
+    )
 
     return (
       <AnimatedToken
@@ -207,6 +284,7 @@ function HeroToken({ currentChar, onCharComplete, currentGroup, onGroupComplete,
     )
   }
 
+  // console.log('no char: =>', token)
   return <Token {...props} />
 }
 
