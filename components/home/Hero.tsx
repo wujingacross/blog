@@ -1,10 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { AnimateSharedLayout, motion, useAnimation } from 'framer-motion'
+import clsx from 'clsx'
 import { fit } from 'utils/fit'
 import { createInViewPromise } from 'utils/createInViewPromise'
 import { wait } from 'utils/wait'
 import { CodeWindow, Token } from 'components/codeWindow'
 import { tokens, code } from '../../samples/hero.html?highlight'
+
+const CHAR_DELAY = 75
+const GROUP_DELAY = 1000
 
 function getRange(text, options = {}) {
   return { start: code.indexOf(text), end: code.indexOf(text) + text.length, ...options }
@@ -102,17 +106,19 @@ function augment(tokens, index = 0) {
 
 augment(tokens)
 
+// console.log('tokens=', tokens)
+
 export default function Hero() {
   const [step, setStep] = useState(-1) // 第几步
-  const [state, setState] = useState({ group: -1, char: -1 })
+  const [state, setState] = useState({ group: -1, char: -1 }) // 动效的控制， group： 每组动效样式的控制， char：每组里样式的每个字符的控制
   const [finished, setFinished] = useState(false)
 
   const mounted = useRef(true) // 标记组件是否加载
-  const inViewRef = useRef() // 进入可视区
-  const containerRef = useRef()
-  const imageRef = useRef()
+  const inViewRef = useRef() // 代码展示区域
+  const containerRef = useRef() // 样式预览区域
+  const imageRef = useRef() // 头像图片DOM
 
-  console.log('mounted.current', mounted.current, state.group, state.char)
+  const layout = !finished
 
   // 组件是否加载
   useEffect(() => {
@@ -125,7 +131,6 @@ export default function Hero() {
   useEffect(() => {
     let current = true
 
-    console.log('inViewRef.current=', inViewRef.current)
     const { promise: inViewPromise, disconnect } = createInViewPromise(inViewRef.current, {
       threshold: 0.5,
     })
@@ -134,6 +139,7 @@ export default function Hero() {
       wait(1000),
       inViewPromise,
       new Promise((resolve) => {
+        // ？？？ 这个Promise不太懂
         if ('requestIdleCallback' in window) {
           window.requestIdleCallback(resolve)
         } else {
@@ -141,7 +147,6 @@ export default function Hero() {
         }
       }),
       new Promise((resolve) => {
-        console.log('imageRef.current', imageRef.current, imageRef.current.complete)
         if (imageRef.current.complete) {
           resolve()
         } else {
@@ -151,9 +156,9 @@ export default function Hero() {
     ]
 
     Promise.all(promises).then(() => {
-      console.log('Promise.all resolve =======>', current)
+      console.log('动效开始 =======>', current)
       if (current) {
-        setState({ group: 0, char: 0 })
+        // setState({ group: 0, char: 0 })
       }
     })
 
@@ -180,19 +185,38 @@ export default function Hero() {
       left={
         <div ref={containerRef} className="lg:-mr-18">
           <AnimateSharedLayout>
-            <div className="relative z-10 rounded-lg shadow-xl text-slate-900 dark:text-slate-300 mx-auto sm:w-[23.4375rem]">
-              <div className="bg-white rounded-lg overflow-hidden ring-1 ring-slate-900/5 dark:bg-slate-800 dark:highlight-white/5 dark:ring-0">
-                <div>
+            <motion.div
+              layout={layout}
+              className="relative z-10 rounded-lg shadow-xl text-slate-900 dark:text-slate-300 mx-auto sm:w-[23.4375rem]"
+            >
+              <motion.div
+                layout={layout}
+                className={clsx(
+                  'bg-white rounded-lg overflow-hidden ring-1 ring-slate-900/5 dark:bg-slate-800 dark:highlight-white/5 dark:ring-0',
+                  {
+                    flex: false,
+                    'p-8': false,
+                    'text-center': false,
+                  }
+                )}
+              >
+                {/* 1. cicle */}
+                <div></div>
+                {/* 2. img */}
+                <motion.div
+                  layout={layout}
+                  className={clsx('relative z-10 overflow-hidden flex-none', 'w-24', 'h-24')}
+                >
                   <motion.img
                     ref={imageRef}
-                    // layout={layout}
+                    layout={layout}
                     // transition={TRANSITION}
                     src={require('img/sarah-dayan.jpg').default.src}
                     decoding="async"
-                    alt=""
-                    // className={clsx('absolute max-w-none object-cover bg-slate-100', {
-                    //   'rounded-full': finished && !md,
-                    // })}
+                    // alt=""
+                    className={clsx('absolute max-w-none object-cover bg-slate-100', {
+                      'rounded-full': false,
+                    })}
                     // style={
                     //   finished
                     //     ? { top: 0, left: 0, width: '100%', height: '100%' }
@@ -204,8 +228,9 @@ export default function Hero() {
                     // }
                     style={fit(96, 96, 384, 512)}
                   />
-                </div>
-                <div>
+                </motion.div>
+                {/* 3. text */}
+                <motion.div layout={layout} className="pt-6">
                   <div className="mb-4">
                     <Words>
                       {/* `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  */}
@@ -214,13 +239,13 @@ export default function Hero() {
                       tiny.”
                     </Words>
                   </div>
-                </div>
-                <div className="flex flex-col">
-                  <p>Sarah Dayan</p>
-                  <p>Staff Engineer, Algolia</p>
-                </div>
-              </div>
-            </div>
+                  <motion.div layout={layout} className="flex flex-col">
+                    <motion.p layout={layout}>Sarah Dayan</motion.p>
+                    <motion.p layout={layout}>Staff Engineer, Algolia</motion.p>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </AnimateSharedLayout>
         </div>
       }
@@ -229,10 +254,46 @@ export default function Hero() {
           <CodeWindow.Code
             ref={inViewRef}
             tokens={tokens}
-            tokenComponent={HeroToken}
+            tokenComponent={HeroToken} // 将tokenProps传到了tokenComponent组件中，即传到了HeroToken组件中
             tokenProps={{
               currentGroup: state.group,
               currentChar: state.char,
+              onCharComplete(charIndex) {
+                // 每个字符完事后的处理
+                // console.log('onCharComplete=', charIndex)
+                if (!mounted.current) return
+                setState((state) => ({ ...state, char: charIndex + 1 }))
+              },
+              async onGroupComplete(groupIndex) {
+                // 每组样式完事后的处理
+                console.log(
+                  'onGroupComplete=',
+                  groupIndex,
+                  ranges[groupIndex + 1] && ranges[groupIndex + 1].immediate
+                )
+                if (!mounted.current) return
+                // setStep(groupIndex)
+
+                // if (groupIndex === 7) {
+                //   if (!supportsMd) return
+                //   await cursorControls.start({ opacity: 0.5, transition: { delay: 1 } })
+                //   if (!mounted.current) return
+                //   setWide(true)
+                //   setIsMd(true)
+                //   await cursorControls.start({ opacity: 0, transition: { delay: 0.5 } })
+                // }
+
+                if (!mounted.current) return
+
+                if (ranges[groupIndex + 1] && ranges[groupIndex + 1].immediate) {
+                  setState({ char: 0, group: groupIndex + 1 })
+                } else {
+                  window.setTimeout(() => {
+                    if (!mounted.current) return
+                    setState({ char: 0, group: groupIndex + 1 })
+                  }, GROUP_DELAY)
+                }
+              },
             }}
           />
         </CodeWindow>
@@ -241,10 +302,11 @@ export default function Hero() {
   )
 }
 
+/**
+ * ******** 代码动效的处理 ********
+ */
 function AnimatedToken({ isActiveToken, onComplete, children }) {
   const [visible, setVisible] = useState(false)
-
-  console.log('isActiveToken=', isActiveToken)
 
   useEffect(() => {
     if (visible) {
@@ -252,22 +314,34 @@ function AnimatedToken({ isActiveToken, onComplete, children }) {
     }
   }, [visible])
 
+  useEffect(() => {
+    if (isActiveToken) {
+      setVisible(true)
+      let id = window.setTimeout(() => {
+        setVisible(true)
+      }, CHAR_DELAY) // 控制代码动效的节奏，不然太快了
+      return () => {
+        window.clearTimeout(id)
+      }
+    }
+  }, [isActiveToken])
+
   return (
     <>
-      <span>{children}</span>
+      <span className={visible ? undefined : 'hidden'}>{children}</span>
     </>
   )
 }
 
-function HeroToken({ currentChar, onCharComplete, currentGroup, onGroupComplete, ...props }) {
+function HeroToken({ currentGroup, currentChar, onCharComplete, onGroupComplete, ...props }) {
   const { token } = props
 
+  // ******** char: 开头的是需要动效的部分，即上面ranges参数，整体可以输出 augment(tokens)后的tokens参数值 ********
   if (token[0].startsWith('char:')) {
-    // console.log('char: =>', token)
+    // console.log('char: =>', token, token[0])
+    // token[0] char:8:0
+    // [NaN, 8, 0]
     const [, groupIndex, indexInGroup] = token[0].split(':').map((x) => parseInt(x, 10))
-    console.log(
-      `HeroToken-------. currentGroup=${currentGroup}, groupIndex=${groupIndex}, currentChar=${currentChar}, indexInGroup=${indexInGroup}`
-    )
 
     return (
       <AnimatedToken
@@ -290,7 +364,7 @@ function HeroToken({ currentChar, onCharComplete, currentGroup, onGroupComplete,
 
 function Layout({ left, right }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center mb-[112rem]">
       <div className="relative row-start-1 col-start-1 col-span-5 xl:col-span-6 -mt-10">
         <div className="h-[24.25rem] max-w-xl mx-auto lg:max-w-none flex items-center justify-center">
           <div className="w-full flex-none">{left}</div>

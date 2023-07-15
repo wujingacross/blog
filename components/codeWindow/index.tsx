@@ -27,6 +27,7 @@ export const CodeWindow = ({ children, className, border = true }) => {
 
 // eslint-disable-next-line react/display-name
 CodeWindow.Code = forwardRef(({ tokens, initialLineNumber = 1, ...props }, ref) => {
+  /// 代码行数
   const lineNumbers = useMemo(() => {
     const t = tokens.flat(Infinity)
     let line = initialLineNumber + 1
