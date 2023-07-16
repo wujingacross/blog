@@ -1,6 +1,9 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useState } from 'react'
 import { AnimateSharedLayout, motion, useAnimation } from 'framer-motion'
 import clsx from 'clsx'
+import { debounce } from 'debounce'
+import { useMedia } from 'hooks/useMedia'
 import { fit } from 'utils/fit'
 import { createInViewPromise } from 'utils/createInViewPromise'
 import { wait } from 'utils/wait'
@@ -9,6 +12,7 @@ import { tokens, code } from '../../samples/hero.html?highlight'
 
 const CHAR_DELAY = 75
 const GROUP_DELAY = 1000
+const TRANSITION = { duration: 0.5 }
 
 function getRange(text, options = {}) {
   return { start: code.indexOf(text), end: code.indexOf(text) + text.length, ...options }
@@ -44,11 +48,25 @@ function getRangeIndex(index, ranges) {
   return [-1]
 }
 
-function Words({ children, bolder = false }) {
+function Words({ children, bolder = false, layout, transition }) {
   return children.split(' ').map((word, i) => {
     return (
       <span key={i} className="relative inline-flex whitespace-pre text-lg">
-        {bolder ? <span className="absolute top-0 left-0">{`${word} `}</span> : `${word} `}
+        {bolder ? (
+          <>
+            <motion.span
+              initial={{ fontWeight: 400 }}
+              animate={{ fontWeight: 500 }}
+              transition={transition}
+              className="absolute top-0 left-0"
+            >
+              {`${word} `}
+            </motion.span>
+            <span style={{ opacity: 0, fontWeight: 500 }}>{word} </span>
+          </>
+        ) : (
+          `${word} `
+        )}
       </span>
     )
   })
@@ -111,7 +129,13 @@ augment(tokens)
 export default function Hero() {
   const [step, setStep] = useState(-1) // 第几步
   const [state, setState] = useState({ group: -1, char: -1 }) // 动效的控制， group： 每组动效样式的控制， char：每组里样式的每个字符的控制
-  const [finished, setFinished] = useState(false)
+  const [finished, setFinished] = useState(false) // 标记动画步骤是否完成
+
+  const [isMd, setIsMd] = useState(false)
+  const supportsMd = useMedia('(min-width: 640px)') // 媒体查询是否匹配Md
+  const cursorControls = useAnimation()
+  const [wide, setWide] = useState(false) // 控制DOM变宽动效
+  const [containerRect, setContainerRect] = useState()
 
   const mounted = useRef(true) // 标记组件是否加载
   const inViewRef = useRef() // 代码展示区域
@@ -119,6 +143,9 @@ export default function Hero() {
   const imageRef = useRef() // 头像图片DOM
 
   const layout = !finished
+  const md = supportsMd && isMd // 控制媒体查询md的样式生效
+
+  // console.log('Hero------- md=', md, supportsMd, isMd, wide)
 
   // 组件是否加载
   useEffect(() => {
@@ -156,9 +183,9 @@ export default function Hero() {
     ]
 
     Promise.all(promises).then(() => {
-      console.log('动效开始 =======>', current)
+      // console.log('动效开始 =======>', current)
       if (current) {
-        // setState({ group: 0, char: 0 })
+        setState({ group: 0, char: 0 })
       }
     })
 
@@ -180,6 +207,53 @@ export default function Hero() {
     }
   }, [step])
 
+  useEffect(() => {
+    if (!finished) return
+    let count = 0
+    cursorControls.start({ opacity: 0.5 })
+    const id = window.setInterval(() => {
+      if (count === 2) {
+        return window.clearInterval(id)
+      }
+      count++
+      cursorControls.start({ opacity: 1, scale: 0.9, transition: { duration: 0.25 } }).then(() => {
+        setWide((wide) => !wide)
+        cursorControls.start({
+          opacity: count === 2 ? 0 : 0.5,
+          scale: 1,
+          transition: { duration: 0.25, delay: 0.6 },
+        })
+      })
+    }, 2000)
+    return () => {
+      window.clearInterval(id)
+    }
+  }, [finished])
+
+  useEffect(() => {
+    if (finished) {
+      const id = window.setTimeout(() => {
+        setIsMd(wide)
+      }, 250)
+      return () => window.clearTimeout(id)
+    }
+  }, [wide, finished])
+
+  // 监听左边展示区的尺寸
+  useEffect(() => {
+    const observer = new window.ResizeObserver(
+      debounce(() => {
+        if (containerRef.current) {
+          setContainerRect(containerRef.current.getBoundingClientRect())
+        }
+      }, 500)
+    )
+    observer.observe(containerRef.current)
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
   return (
     <Layout
       left={
@@ -187,61 +261,134 @@ export default function Hero() {
           <AnimateSharedLayout>
             <motion.div
               layout={layout}
+              transition={TRANSITION}
               className="relative z-10 rounded-lg shadow-xl text-slate-900 dark:text-slate-300 mx-auto sm:w-[23.4375rem]"
+              animate={
+                containerRect?.width
+                  ? {
+                      width: !supportsMd || wide ? containerRect.width : 375,
+                    }
+                  : {}
+              }
             >
               <motion.div
                 layout={layout}
                 className={clsx(
                   'bg-white rounded-lg overflow-hidden ring-1 ring-slate-900/5 dark:bg-slate-800 dark:highlight-white/5 dark:ring-0',
                   {
-                    flex: false,
-                    'p-8': false,
-                    'text-center': false,
+                    flex: step >= 8 && md,
+                    'p-8': step >= 0,
+                    'text-center': (step >= 7 && !md) || (step < 14 && md),
                   }
                 )}
               >
                 {/* 1. cicle */}
-                <div></div>
+                <motion.div
+                  layout={layout}
+                  initial={{ opacity: 0 }}
+                  animate={cursorControls}
+                  className={clsx(
+                    'absolute z-20 top-1/2 right-0 xl:right-auto xl:left-0 text-black rounded-full -mt-4 -mr-4 xl:mr-0 xl:-ml-4 pointer-events-none',
+                    { invisible: !supportsMd }
+                  )}
+                >
+                  <svg className="h-8 w-8" viewBox="0 0 100 100">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke="rgba(255, 255, 255, 0.5)"
+                      strokeWidth="8"
+                      fill="rgba(0, 0, 0, 0.5)"
+                    />
+                  </svg>
+                </motion.div>
                 {/* 2. img */}
                 <motion.div
                   layout={layout}
-                  className={clsx('relative z-10 overflow-hidden flex-none', 'w-24', 'h-24')}
+                  transition={TRANSITION}
+                  animate={{
+                    ...(step >= 1 ? { borderRadius: 96 / 2 } : { borderRadius: 0 }),
+                    ...((step >= 1 && step < 11) || (step >= 11 && !md && !finished)
+                      ? { borderRadius: 96 / 2 }
+                      : { borderRadius: 0 }),
+                  }}
+                  className={clsx(
+                    'relative z-10 overflow-hidden flex-none',
+                    step >= 10 && md ? '-m-8 mr-8' : step >= 2 ? 'mx-auto' : undefined,
+                    step >= 12 && md ? 'w-48' : 'w-24',
+                    step >= 13 && md ? 'h-auto' : 'h-24'
+                  )}
                 >
                   <motion.img
                     ref={imageRef}
                     layout={layout}
-                    // transition={TRANSITION}
+                    transition={TRANSITION}
                     src={require('img/sarah-dayan.jpg').default.src}
                     decoding="async"
-                    // alt=""
+                    alt=""
                     className={clsx('absolute max-w-none object-cover bg-slate-100', {
-                      'rounded-full': false,
+                      'rounded-full': finished && !md,
                     })}
-                    // style={
-                    //   finished
-                    //     ? { top: 0, left: 0, width: '100%', height: '100%' }
-                    //     : step >= 13 && md
-                    //     ? fit(192, containerRect.height, 384, 512)
-                    //     : step >= 12 && md
-                    //     ? fit(192, 96, 384, 512)
-                    //     : fit(96, 96, 384, 512)
-                    // }
-                    style={fit(96, 96, 384, 512)}
+                    style={
+                      finished
+                        ? { top: 0, left: 0, width: '100%', height: '100%' }
+                        : step >= 13 && md
+                        ? fit(192, containerRect.height, 384, 512)
+                        : step >= 12 && md
+                        ? fit(192, 96, 384, 512)
+                        : fit(96, 96, 384, 512)
+                    }
                   />
                 </motion.div>
                 {/* 3. text */}
-                <motion.div layout={layout} className="pt-6">
-                  <div className="mb-4">
-                    <Words>
+                <motion.div
+                  layout={layout}
+                  transition={TRANSITION}
+                  className={step >= 10 && md ? '' : 'pt-6'}
+                >
+                  <motion.div layout={layout} transition={TRANSITION} className="mb-4">
+                    <Words bolder={step >= 3} layout={layout} transition={TRANSITION}>
                       {/* `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  */}
                       “Tailwind CSS is the only framework that I&apos;ve seen scale on large teams.
                       It&rsquo;s easy to customize, adapts to any design, and the build size is
                       tiny.”
                     </Words>
-                  </div>
-                  <motion.div layout={layout} className="flex flex-col">
-                    <motion.p layout={layout}>Sarah Dayan</motion.p>
-                    <motion.p layout={layout}>Staff Engineer, Algolia</motion.p>
+                  </motion.div>
+                  <motion.div
+                    layout={layout}
+                    className={clsx(
+                      'flex flex-col',
+                      (step >= 7 && !md) || (step < 14 && md) ? 'items-center' : 'items-start'
+                    )}
+                    style={{
+                      ...(step >= 4 ? { fontWeight: 500 } : { fontWeight: 400 }),
+                    }}
+                  >
+                    <motion.p
+                      layout={layout}
+                      transition={TRANSITION}
+                      className={clsx(
+                        'transition-colors duration-500',
+                        step >= 5
+                          ? 'text-sky-500 dark:text-sky-400'
+                          : 'text-black dark:text-slate-300'
+                      )}
+                    >
+                      Sarah Dayan
+                    </motion.p>
+                    <motion.p
+                      layout={layout}
+                      transition={TRANSITION}
+                      className={clsx(
+                        'transition-colors duration-500',
+                        step >= 6
+                          ? 'text-slate-700 dark:text-slate-500'
+                          : 'text-black dark:text-slate-300'
+                      )}
+                    >
+                      Staff Engineer, Algolia
+                    </motion.p>
                   </motion.div>
                 </motion.div>
               </motion.div>
@@ -266,22 +413,22 @@ export default function Hero() {
               },
               async onGroupComplete(groupIndex) {
                 // 每组样式完事后的处理
-                console.log(
-                  'onGroupComplete=',
-                  groupIndex,
-                  ranges[groupIndex + 1] && ranges[groupIndex + 1].immediate
-                )
+                // console.log(
+                //   'onGroupComplete=',
+                //   groupIndex,
+                //   ranges[groupIndex + 1] && ranges[groupIndex + 1].immediate
+                // )
                 if (!mounted.current) return
-                // setStep(groupIndex)
+                setStep(groupIndex)
 
-                // if (groupIndex === 7) {
-                //   if (!supportsMd) return
-                //   await cursorControls.start({ opacity: 0.5, transition: { delay: 1 } })
-                //   if (!mounted.current) return
-                //   setWide(true)
-                //   setIsMd(true)
-                //   await cursorControls.start({ opacity: 0, transition: { delay: 0.5 } })
-                // }
+                if (groupIndex === 7) {
+                  if (!supportsMd) return
+                  await cursorControls.start({ opacity: 0.5, transition: { delay: 1 } })
+                  if (!mounted.current) return
+                  setWide(true)
+                  setIsMd(true)
+                  await cursorControls.start({ opacity: 0, transition: { delay: 0.5 } })
+                }
 
                 if (!mounted.current) return
 
@@ -316,10 +463,10 @@ function AnimatedToken({ isActiveToken, onComplete, children }) {
 
   useEffect(() => {
     if (isActiveToken) {
-      setVisible(true)
+      // 控制代码动效的节奏，不然太快了
       let id = window.setTimeout(() => {
         setVisible(true)
-      }, CHAR_DELAY) // 控制代码动效的节奏，不然太快了
+      }, CHAR_DELAY)
       return () => {
         window.clearTimeout(id)
       }

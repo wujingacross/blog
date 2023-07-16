@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export function Token({ token, parentTypes, children }: any) {
   return <span className={`token ${token[0]}`}>{children}</span>
 }
@@ -12,6 +14,7 @@ export const Code = ({
   const tokensArr = Array.isArray(tokens) ? tokens : [tokens]
 
   return tokensArr.map((token, i) => {
+    // @ts-ignore
     const t = transformTokens(token, tokensArr, i)
 
     if (typeof t === 'string') return t
