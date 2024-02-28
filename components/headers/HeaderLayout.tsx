@@ -7,6 +7,11 @@ export function NavItems() {
   return (
     <>
       <li>
+        <Link href="/docs/installation" className="hover:text-sky-500 dark:hover:text-sky-400">
+          Docs
+        </Link>
+      </li>
+      <li>
         <a
           href="https://tailwindui.com/?ref=top"
           className="hover:text-sky-500 dark:hover:text-sky-400"
@@ -21,21 +26,19 @@ export function NavItems() {
       </li>
       <li>
         <Link href="/showcase" className="hover:text-sky-500 dark:hover:text-sky-400">
-          <>
-            Showcase
-            <span className="ml-2 font-medium text-xs leading-5 rounded-full text-sky-600 bg-sky-400/10 px-2 py-0.5  dark:text-sky-400">
-              New
-            </span>
-          </>
+          Showcase
         </Link>
+        <span className="ml-2 font-medium text-xs leading-5 rounded-full text-sky-600 bg-sky-400/10 px-2 py-0.5  dark:text-sky-400">
+          New
+        </span>
       </li>
     </>
   )
 }
 
 export default function Header() {
-  let [isOpaque, setIsOpaque] = useState(false)
-  console.log('vbbbb', isOpaque)
+  let [isOpaque, setIsOpaque] = useState(false) // 页面滚动超过50时，是否显示透明背景
+  // console.log('页面Header是否显示透明背景', isOpaque)
 
   useEffect(() => {
     let offset = 50

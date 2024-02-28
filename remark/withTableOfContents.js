@@ -6,6 +6,7 @@ module.exports.withTableOfContents = () => {
     const component = addImport(tree, 'components/Heading', 'Heading')
     const contents = []
 
+    console.log('withTableOfContents', tree, component)
     for (let nodeIndex = 0; nodeIndex < tree.children.length; nodeIndex++) {
       let node = tree.children[nodeIndex]
 
@@ -87,6 +88,7 @@ module.exports.withTableOfContents = () => {
       }
     }
 
+    console.log('tableOfContents=', contents)
     addExport(tree, 'tableOfContents', contents)
   }
 }

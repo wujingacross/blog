@@ -1,47 +1,38 @@
-import {
-  useState,
-  useEffect,
-  createContext,
-  Fragment,
-  useCallback,
-  useContext,
-} from "react";
-import { ClassTable } from "components/ClassTable";
-import { useRouter } from "next/router";
-import { usePrevNext } from "hooks/usePrevNext";
-import Link from "next/link";
-import { SidebarLayout, SidebarContext } from "layouts/SidebarLayout";
-// import { PageHeader } from "@/components/PageHeader";
-import clsx from "clsx";
-// import { DocsFooter } from '@/components/DocsFooter'
-import { Heading } from "components/Heading";
-import { MDXProvider } from "@mdx-js/react";
+import { useState, useEffect, createContext, Fragment, useCallback, useContext } from 'react'
+import { ClassTable } from 'components/ClassTable'
+import { useRouter } from 'next/router'
+import { usePrevNext } from 'hooks/usePrevNext'
+import Link from 'next/link'
+import { SidebarLayout, SidebarContext } from 'layouts/SidebarLayout'
+// import { PageHeader } from 'components/PageHeader'
+import clsx from 'clsx'
+import { DocsFooter } from 'components/DocsFooter'
+import { MDXProvider } from '@mdx-js/react'
+import { mdxComponents } from 'utils/mdxComponents'
 
-export const ContentsContext = createContext();
+export const ContentsContext = createContext()
 
 function TableOfContents({ tableOfContents, currentSection }) {
-  let sidebarContext = useContext(SidebarContext);
-  let isMainNav = Boolean(sidebarContext);
+  let sidebarContext = useContext(SidebarContext)
+  let isMainNav = Boolean(sidebarContext)
 
   function closeNav() {
     if (isMainNav) {
-      sidebarContext.setNavIsOpen(false);
+      sidebarContext.setNavIsOpen(false)
     }
   }
 
   function isActive(section) {
     if (section.slug === currentSection) {
-      return true;
+      return true
     }
     if (!section.children) {
-      return false;
+      return false
     }
-    return section.children.findIndex(isActive) > -1;
+    return section.children.findIndex(isActive) > -1
   }
 
-  let pageHasSubsections = tableOfContents.some(
-    (section) => section.children.length > 0
-  );
+  let pageHasSubsections = tableOfContents.some((section) => section.children.length > 0)
 
   return (
     <>
@@ -57,11 +48,11 @@ function TableOfContents({ tableOfContents, currentSection }) {
                   href={`#${section.slug}`}
                   onClick={closeNav}
                   className={clsx(
-                    "block py-1",
-                    pageHasSubsections ? "font-medium" : "",
+                    'block py-1',
+                    pageHasSubsections ? 'font-medium' : '',
                     isActive(section)
-                      ? "font-medium text-sky-500 dark:text-sky-400"
-                      : "hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-300"
+                      ? 'font-medium text-sky-500 dark:text-sky-400'
+                      : 'hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-300'
                   )}
                 >
                   {section.title}
@@ -73,10 +64,10 @@ function TableOfContents({ tableOfContents, currentSection }) {
                     href={`#${subsection.slug}`}
                     onClick={closeNav}
                     className={clsx(
-                      "group flex items-start py-1",
+                      'group flex items-start py-1',
                       isActive(subsection)
-                        ? "text-sky-500 dark:text-sky-400"
-                        : "hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-300"
+                        ? 'text-sky-500 dark:text-sky-400'
+                        : 'hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-300'
                     )}
                   >
                     <svg
@@ -122,8 +113,7 @@ function TableOfContents({ tableOfContents, currentSection }) {
               </p>
               <figure className="mt-6 pl-4 border-l border-slate-100 dark:border-slate-700">
                 <blockquote className="text-sm leading-5 text-slate-600 dark:text-slate-400">
-                  “This is the survival kit I wish I had when I started building
-                  apps.”
+                  “This is the survival kit I wish I had when I started building apps.”
                 </blockquote>
                 <figcaption className="mt-3 text-xs leading-5 text-slate-500">
                   Derrick Reimer, <span className="">SavvyCal</span>
@@ -134,63 +124,76 @@ function TableOfContents({ tableOfContents, currentSection }) {
         </div>
       </div>
     </>
-  );
+  )
+}
+
+function getTop(id) {
+  let el = document.getElementById(id)
+  return el ? el.getBoundingClientRect().top + window.scrollY : 0
 }
 
 function useTableOfContents(tableOfContents) {
-  let [currentSection, setCurrentSection] = useState(tableOfContents[0]?.slug);
-  let [headings, setHeadings] = useState([]);
+  let [currentSection, setCurrentSection] = useState(tableOfContents[0]?.slug)
+  let [headings, setHeadings] = useState([])
 
-  const registerHeading = useCallback((id, top) => {
-    setHeadings((headings) => [
-      ...headings.filter((h) => id !== h.id),
-      { id, top },
-    ]);
-  }, []);
+  const registerHeading = useCallback((id) => {
+    setHeadings((headings) => [...headings.filter((h) => id !== h.id), { id, top: getTop(id) }])
+  }, [])
 
   const unregisterHeading = useCallback((id) => {
-    setHeadings((headings) => headings.filter((h) => id !== h.id));
-  }, []);
+    setHeadings((headings) => headings.filter((h) => id !== h.id))
+  }, [])
 
   useEffect(() => {
-    if (tableOfContents.length === 0 || headings.length === 0) return;
-    function onScroll() {
-      let style = window.getComputedStyle(document.documentElement);
-      let scrollMt = parseFloat(
-        style.getPropertyValue("--scroll-mt").match(/[\d.]+/)?.[0] ?? 0
-      );
-      let fontSize = parseFloat(style.fontSize.match(/[\d.]+/)?.[0] ?? 16);
-      scrollMt = scrollMt * fontSize;
+    if (tableOfContents.length === 0 || headings.length === 0) return
 
-      let sortedHeadings = headings.concat([]).sort((a, b) => a.top - b.top);
-      let top = window.pageYOffset + scrollMt + 1;
-      let current = sortedHeadings[0].id;
+    function onScroll() {
+      let style = window.getComputedStyle(document.documentElement)
+      let scrollMt = parseFloat(style.getPropertyValue('--scroll-mt').match(/[\d.]+/)?.[0] ?? 0)
+      let fontSize = parseFloat(style.fontSize.match(/[\d.]+/)?.[0] ?? 16)
+      scrollMt = scrollMt * fontSize
+
+      let sortedHeadings = headings.concat([]).sort((a, b) => a.top - b.top)
+      let top = window.pageYOffset + scrollMt + 1
+      let current = sortedHeadings[0].id
       for (let i = 0; i < sortedHeadings.length; i++) {
         if (top >= sortedHeadings[i].top) {
-          current = sortedHeadings[i].id;
+          current = sortedHeadings[i].id
         }
       }
-      setCurrentSection(current);
+      setCurrentSection(current)
     }
-    window.addEventListener("scroll", onScroll, {
+
+    window.addEventListener('scroll', onScroll, {
       capture: true,
       passive: true,
-    });
-    onScroll();
+    })
+
+    onScroll()
+
+    let resizeObserver = new window.ResizeObserver(() => {
+      for (let heading of headings) {
+        heading.top = getTop(heading.id)
+      }
+    })
+
+    resizeObserver.observe(document.body)
     return () => {
-      window.removeEventListener("scroll", onScroll, {
+      resizeObserver.disconnect()
+      window.removeEventListener('scroll', onScroll, {
         capture: true,
         passive: true,
-      });
-    };
-  }, [headings, tableOfContents]);
+      })
+    }
+  }, [headings, tableOfContents])
 
-  return { currentSection, registerHeading, unregisterHeading };
+  return { currentSection, registerHeading, unregisterHeading }
 }
 
 export function ContentsLayoutOuter({ children, layoutProps, ...props }) {
-  const { currentSection, registerHeading, unregisterHeading } =
-    useTableOfContents(layoutProps.tableOfContents);
+  const { currentSection, registerHeading, unregisterHeading } = useTableOfContents(
+    layoutProps.tableOfContents
+  )
 
   return (
     <SidebarLayout
@@ -208,27 +211,20 @@ export function ContentsLayoutOuter({ children, layoutProps, ...props }) {
         {children}
       </ContentsContext.Provider>
     </SidebarLayout>
-  );
+  )
 }
 
-export function ContentsLayout({
-  children,
-  meta,
-  classes,
-  tableOfContents,
-  section,
-}) {
-  const router = useRouter();
+export function ContentsLayout({ children, meta, classes, tableOfContents, section }) {
+  const router = useRouter()
   const toc = [
-    ...(classes
-      ? [{ title: "Quick reference", slug: "class-reference", children: [] }]
-      : []),
+    ...(classes ? [{ title: 'Quick reference', slug: 'class-reference', children: [] }] : []),
     ...tableOfContents,
-  ];
+  ]
 
-  const { currentSection, registerHeading, unregisterHeading } =
-    useTableOfContents(toc);
-  let { prev, next } = usePrevNext();
+  console.log('toc=', toc, classes, tableOfContents)
+
+  const { currentSection, registerHeading, unregisterHeading } = useTableOfContents(toc)
+  let { prev, next } = usePrevNext()
 
   return (
     <div className="max-w-3xl mx-auto pt-10 xl:max-w-none xl:ml-0 xl:mr-[15.5rem] xl:pr-16">
@@ -247,7 +243,7 @@ export function ContentsLayout({
               id="content-wrapper"
               className="relative z-20 prose prose-slate mt-12 dark:prose-dark"
             >
-              <MDXProvider components={{ Heading }}>{children}</MDXProvider>
+              <MDXProvider components={mdxComponents}>{children}</MDXProvider>
             </div>
           </>
         ) : (
@@ -255,27 +251,25 @@ export function ContentsLayout({
             id="content-wrapper"
             className="relative z-20 prose prose-slate mt-8 dark:prose-dark"
           >
-            <MDXProvider components={{ Heading }}>{children}</MDXProvider>
+            <MDXProvider components={mdxComponents}>{children}</MDXProvider>
           </div>
         )}
       </ContentsContext.Provider>
-      {/* 
+
       <DocsFooter previous={prev} next={next}>
         <Link
           href={`https://github.com/tailwindlabs/tailwindcss.com/edit/master/src/pages${router.pathname}.mdx`}
+          className="hover:text-slate-900 dark:hover:text-slate-400"
         >
-          <a className="hover:text-slate-900 dark:hover:text-slate-400">Edit this page on GitHub</a>
+          Edit this page on GitHub
         </Link>
-      </DocsFooter> */}
+      </DocsFooter>
 
       <div className="fixed z-20 top-[3.8125rem] bottom-0 right-[max(0px,calc(50%-45rem))] w-[19.5rem] py-10 overflow-y-auto hidden xl:block">
         {toc.length > 0 && (
-          <TableOfContents
-            tableOfContents={toc}
-            currentSection={currentSection}
-          />
+          <TableOfContents tableOfContents={toc} currentSection={currentSection} />
         )}
       </div>
     </div>
-  );
+  )
 }

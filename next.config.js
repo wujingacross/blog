@@ -7,7 +7,6 @@ const { withSyntaxHighlighting } = require('./remark/withSyntaxHighlighting')
 const { withPrevalInstructions } = require('./remark/withPrevalInstructions')
 const { withTableOfContents } = require('./remark/withTableOfContents')
 const withExamples = require('./remark/withExamples')
-const { withNextLinks } = require('./remark/withNextLinks')
 const { withLinkRoles } = require('./rehype/withLinkRoles')
 const Prism = require('prismjs')
 const {
@@ -22,7 +21,7 @@ const fallbackLayouts = {
 }
 
 const fallbackDefaultExports = {
-  'pages/{docs,components}/**/*': ['layouts/ContentsLayoust', 'ContentsLayout'],
+  'pages/{docs,components}/**/*': ['layouts/ContentsLayout', 'ContentsLayout'],
   'pages/blog/**/*': ['layouts/BlogPostLayout', 'BlogPostLayout'],
   'pages/showcase/**/*': ['layouts/ShowcaseLayout', 'ShowcaseLayout'],
 }
@@ -40,7 +39,7 @@ const fallbackGetStaticProps = {
 // });
 
 module.exports = {
-  pageExtensions: ['ts', 'tsx', 'md', 'mdx'],
+  pageExtensions: ['js', 'ts', 'tsx', 'md', 'mdx'],
   experimental: {
     esmExternals: false,
   },
@@ -78,10 +77,10 @@ module.exports = {
             example:
               Object.keys(utilities).length > 0
                 ? Object.keys(utilities)
-                    [Math.floor((Object.keys(utilities).length - 1) / 2)].split(/[>:]/)[0]
-                    .trim()
-                    .substr(1)
-                    .replace(/\\/g, '')
+                [Math.floor((Object.keys(utilities).length - 1) / 2)].split(/[>:]/)[0]
+                  .trim()
+                  .substr(1)
+                  .replace(/\\/g, '')
                 : undefined,
           }
         })
@@ -97,17 +96,16 @@ module.exports = {
           plugins === null
             ? {}
             : {
-                remarkPlugins: [
-                  withPrevalInstructions,
-                  withExamples,
-                  withTableOfContents,
-                  withSyntaxHighlighting,
-                  withNextLinks,
-                  withSmartQuotes,
-                  ...plugins,
-                ],
-                rehypePlugins: [withLinkRoles],
-              },
+              remarkPlugins: [
+                withPrevalInstructions,
+                withExamples,
+                withTableOfContents,
+                withSyntaxHighlighting,
+                withSmartQuotes,
+                ...plugins,
+              ],
+              rehypePlugins: [withLinkRoles],
+            },
       },
       createLoader(function (source) {
         console.log('mainMdxLoader 3 -----')
@@ -195,7 +193,6 @@ module.exports = {
     })
 
     function mainMdxLoader(plugins) {
-      console.log('mainMdxLoader-----', plugins)
       return [
         options.defaultLoaders.babel,
         createLoader(function (source) {
