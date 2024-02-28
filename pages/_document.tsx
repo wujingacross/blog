@@ -1,18 +1,20 @@
 import clsx from 'clsx'
-import NextDocument, { Html, Head, Main, NextScript } from "next/document";
+import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
 
 export default class Document extends NextDocument {
   render() {
     return (
-      <Html lang="en" >
+      <Html lang="en">
         <Head />
-        <body className={clsx('antialiased text-slate-500 dark:text-slate-400', {
-          'bg-white dark:bg-slate-900': !this.props.dangerousAsPath.startsWith('/examples/'),
-        })}>
+        <body
+          className={clsx('antialiased text-slate-500 dark:text-slate-400', {
+            'bg-white dark:bg-slate-900': !this.props.dangerousAsPath.startsWith('/examples/'),
+          })}
+        >
           <Main />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }
