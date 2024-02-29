@@ -214,7 +214,7 @@ export function ContentsLayoutOuter({ children, layoutProps, ...props }) {
   )
 }
 
-export function ContentsLayout({ children, meta, classes, tableOfContents, section }) {
+export function ContentsLayout({ children, meta, classes, tableOfContents = [], section }) {
   const router = useRouter()
   const toc = [
     ...(classes ? [{ title: 'Quick reference', slug: 'class-reference', children: [] }] : []),

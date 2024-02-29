@@ -5,7 +5,7 @@ import { documentationNav } from 'navs/documentation'
 export function DocumentationLayout(props) {
     return (
         <>
-            <Title>{props.layoutProps.meta.metaTitle || props.layoutProps.meta.title}</Title>1111
+            <Title>{props.layoutProps.meta.metaTitle || props.layoutProps.meta.title}</Title>
             <SidebarLayout nav={documentationNav} {...props} />
         </>
     )

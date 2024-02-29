@@ -6,7 +6,8 @@ module.exports.withTableOfContents = () => {
     const component = addImport(tree, 'components/Heading', 'Heading')
     const contents = []
 
-    console.log('withTableOfContents', tree, component)
+    console.log("withTableOfContents");
+
     for (let nodeIndex = 0; nodeIndex < tree.children.length; nodeIndex++) {
       let node = tree.children[nodeIndex]
 
@@ -87,8 +88,6 @@ module.exports.withTableOfContents = () => {
         node.value = node.value.replace(/^\s*<Heading([\s>])/, `<Heading id="${slugify(title)}"$1`)
       }
     }
-
-    console.log('tableOfContents=', contents)
     addExport(tree, 'tableOfContents', contents)
   }
 }
