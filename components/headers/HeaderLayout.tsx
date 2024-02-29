@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { ThemeToggle } from 'components/headers/ThemeToggle'
+
+// 路由页面顶部的导航栏
 
 export function NavItems() {
   return (
@@ -36,7 +38,7 @@ export function NavItems() {
   )
 }
 
-export default function Header() {
+function HeaderBar() {
   let [isOpaque, setIsOpaque] = useState(false) // 页面滚动超过50时，是否显示透明背景
   // console.log('页面Header是否显示透明背景', isOpaque)
 
@@ -69,7 +71,7 @@ export default function Header() {
         <div className="flex items-center justify-between py-4 px-4 lg:px-8 border-b lg:border-0 border-slate-900/10">
           <Link href="/">Logo</Link>
           <div className="flex items-center">
-            <nav>
+            <nav className="text-sm leading-6 font-semibold text-slate-700 dark:text-slate-200">
               <ul className="flex items-center space-x-8">
                 <NavItems />
               </ul>
@@ -90,5 +92,39 @@ export default function Header() {
         </div>
       </div>
     </div>
+  )
+}
+
+function Bg() {
+  return (
+    <div className="absolute z-20 top-0 inset-x-0 flex justify-center overflow-hidden pointer-events-none">
+      <picture>
+        <source srcSet={require('img/beams/docs@30.avif').default.src} type="image/avif" />
+        <img
+          src={require('img/beams/docs@tinypng.png').default.src}
+          alt=""
+          className="w-[71.75rem] flex-none max-w-none dark:hidden"
+          decoding="async"
+        />
+      </picture>
+      <picture>
+        <source srcSet={require('img/beams/docs-dark@30.avif').default.src} type="image/avif" />
+        <img
+          src={require('img/beams/docs-dark@tinypng.png').default.src}
+          alt=""
+          className="w-[90rem] flex-none max-w-none hidden dark:block"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  )
+}
+
+export default function Header() {
+  return (
+    <Fragment>
+      <Bg />
+      <HeaderBar />
+    </Fragment>
   )
 }

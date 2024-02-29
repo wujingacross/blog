@@ -3,6 +3,8 @@ import { Fragment, useState } from 'react'
 import 'styles/globals.css'
 import HeaderLayout from 'components/headers/HeaderLayout'
 
+// 全局布局文件
+
 export default function App({ Component, pageProps, router }: AppProps) {
   let [navIsOpen, setNavIsOpen] = useState(false)
 

@@ -4,6 +4,8 @@ import Hero from 'components/home/Hero'
 import styles from './Header.module.css'
 import clsx from 'clsx'
 
+// 网站首页顶部的导航栏
+
 export function NavItems() {
   return (
     <>
@@ -82,7 +84,7 @@ const TopMenuBar = () => (
 )
 
 const Title = () => (
-  <div className="pt-20">
+  <div className="relative pt-20 lg:pt-32">
     <h1 className="text-4xl text-slate-900 font-extrabold sm:text-5xl lg:text-6xl tracking-tight text-center dark:text-white">
       websites
     </h1>

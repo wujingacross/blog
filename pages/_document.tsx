@@ -1,6 +1,8 @@
 import clsx from 'clsx'
 import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
 
+// 服务器的初始响应
+
 export default class Document extends NextDocument {
   render() {
     return (
