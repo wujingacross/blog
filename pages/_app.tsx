@@ -8,8 +8,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
 
   const showHeader = router.pathname !== '/'
   const Layout = (Component as any).layoutProps?.Layout || Fragment
-  const layoutProps = (Component as any)?.Layout
-    ? { layoutProps: Component as any, navIsOpen, setNavIsOpen }
+  const layoutProps = (Component as any).layoutProps?.Layout
+    ? { layoutProps: (Component as any).layoutProps, navIsOpen, setNavIsOpen }
     : {}
 
   return (
