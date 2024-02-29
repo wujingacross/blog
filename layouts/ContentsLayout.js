@@ -221,8 +221,6 @@ export function ContentsLayout({ children, meta, classes, tableOfContents = [], 
     ...tableOfContents,
   ]
 
-  console.log('toc=', toc, classes, tableOfContents)
-
   const { currentSection, registerHeading, unregisterHeading } = useTableOfContents(toc)
   let { prev, next } = usePrevNext()
 

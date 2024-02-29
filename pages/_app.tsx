@@ -7,9 +7,9 @@ export default function App({ Component, pageProps, router }: AppProps) {
   let [navIsOpen, setNavIsOpen] = useState(false)
 
   const showHeader = router.pathname !== '/'
-  const Layout = Component.layoutProps?.Layout || Fragment
-  const layoutProps = Component.layoutProps?.Layout
-    ? { layoutProps: Component.layoutProps, navIsOpen, setNavIsOpen }
+  const Layout = (Component as any).layoutProps?.Layout || Fragment
+  const layoutProps = (Component as any)?.Layout
+    ? { layoutProps: Component as any, navIsOpen, setNavIsOpen }
     : {}
 
   return (

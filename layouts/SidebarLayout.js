@@ -510,7 +510,7 @@ function Wrapper({ allowOverflow, children }) {
 
 export function SidebarLayout({
   children,
-  navIsOpen,
+  navIsOpen = false,
   setNavIsOpen,
   nav,
   sidebar,
