@@ -69,7 +69,7 @@ function Site({ site, priority = false }) {
 
 
     return (
-        <li className='group relative rounded-3xl bg-slate-50 p-6 dark:bg-slate-800/80 dark:highlight-white/5 hover:bg-slate-100 dark:hover:bg-slate-700/50'
+        <li className="group relative rounded-3xl bg-slate-50 p-6 dark:bg-slate-800/80 dark:highlight-white/5 hover:bg-slate-100 dark:hover:bg-slate-700/50"
             onMouseEnter={() => {
                 console.log('onMouseEnter', state.current)
                 if (state.current === 'idle') {
@@ -87,11 +87,11 @@ function Site({ site, priority = false }) {
                 hideVideo()
             }}
         >
-            <div className='relative aspect-[672/494] rounded-md overflow-hidden transform shadow-[0_2px_8px_rgba(15,23,42,0.08)] bg-slate-200 dark:bg-slate-700'>
+            <div className="relative aspect-[672/494] rounded-md overflow-hidden transform shadow-[0_2px_8px_rgba(15,23,42,0.08)] bg-slate-200 dark:bg-slate-700">
                 <Image
                     src={site.thumbnail}
                     alt=""
-                    className={clsx('absolute inset-0 w-full h-full', site.dark && 'dark:hidden')}
+                    className={clsx("absolute inset-0 w-full h-full", site.dark && 'dark:hidden')}
                     priority={priority}
                     unoptimized
                 />
@@ -124,8 +124,8 @@ function Site({ site, priority = false }) {
                         muted
                         playsInline
                         className={clsx(
-                            'absolute inset-0 w-full h-full [mask-image:radial-gradient(white,black)]',
-                            site.dark && 'dark:hidden'
+                            "absolute inset-0 w-full h-full [mask-image:radial-gradient(white,black)]",
+                            site.dark && "dark:hidden"
                         )}
                         onEnded={onEnded}
                     >
@@ -137,15 +137,15 @@ function Site({ site, priority = false }) {
                             preload="none"
                             muted
                             playsInline
-                            className='absolute inset-0 w-full h-full [mask-image:radial-gradient(white,black)] hidden dark:block'
+                            className="absolute inset-0 w-full h-full [mask-image:radial-gradient(white,black)] hidden dark:block"
                         >
                             <source src={site.dark.video} type={site.videoType ?? 'video/mp4'} />
                         </video>
                     )}
                 </div>
             </div>
-            <div className='mt-6 flex flex-wrap items-center'>
-                <h2 className='text-sm leading-6 text-slate-900 dark:text-white font-semibold group-hover:text-sky-500 dark:group-hover:text-sky-400'>
+            <div className="mt-6 flex flex-wrap items-center">
+                <h2 className="text-sm leading-6 text-slate-900 dark:text-white font-semibold group-hover:text-sky-500 dark:group-hover:text-sky-400">
                     <Link href={`/showcase/${site.slug}`}>{site.name}</Link>
                 </h2>
                 {/* group-hover 在group组悬浮的时候就显示这个svg, 如果只是单纯的hover,只有在svg本身悬浮的时候才会进行显示 */}
@@ -175,11 +175,11 @@ export default function Showcase() {
         <>
             <main className="mt-16 sm:mt-20 relative">
                 <Bg />
-                <div className='relative max-w-3xl px-4 sm:px-6 lg:px-8 mx-auto sm:text-center'>
-                    <h1 className='text-sm leading-6 font-semibold text-sky-500'>Showcase</h1>
-                    <p className='mt-6 text-[2.5rem] leading-none sm:text-6xl tracking-tight font-bold text-slate-900 dark:text-white'>You can build anything with Tailwind CSS.</p>
-                    <p className='mt-4 text-lg text-slate-600 dark:text-slate-400'>Well not quite <em>anything</em>, like you can't build a spaceship with it. But you can
-                        definitely build the website for the spaceship —{' '}
+                <div className="relative max-w-3xl px-4 sm:px-6 lg:px-8 mx-auto sm:text-center">
+                    <h1 className="text-sm leading-6 font-semibold text-sky-500">Showcase</h1>
+                    <p className="mt-6 text-[2.5rem] leading-none sm:text-6xl tracking-tight font-bold text-slate-900 dark:text-white">You can build anything with Tailwind CSS.</p>
+                    <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Well not quite <em>anything</em>, like you can&apos;t build a spaceship with it. But you can
+                        definitely build the website for the spaceship —{" "}
                         <Link
                             href="/showcase/nasa"
                             className="font-semibold border-b border-sky-300 text-gray-900 hover:border-b-2 dark:text-white dark:border-sky-400"
@@ -189,7 +189,7 @@ export default function Showcase() {
                         .
                     </p>
                 </div>
-                <ul className='relative grid max-w-[26rem] sm:max-w-[52.5rem] mt-16 sm:mt-20 md:mt-32 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mx-auto gap-6 lg:gap-y-8 xl:gap-x-8 lg:max-w-7xl px-4 sm:px-6 lg:px-8'>
+                <ul className="relative grid max-w-[26rem] sm:max-w-[52.5rem] mt-16 sm:mt-20 md:mt-32 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mx-auto gap-6 lg:gap-y-8 xl:gap-x-8 lg:max-w-7xl px-4 sm:px-6 lg:px-8">
                     {showcase.map((site, siteIndex) => {
                         return <Site key={site.name} site={site} priority={siteIndex < 6} />
                     })}
