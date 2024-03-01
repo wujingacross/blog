@@ -44,6 +44,20 @@ module.exports = {
     esmExternals: false,
   },
   webpack(config, options) {
+    config.module.rules.push({
+      test: /\.mp4$/i,
+      issuer: /\.(jsx?|tsx?|mdx)$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next',
+            name: 'static/media/[name].[sha1:hash].[ext]',
+          },
+        },
+      ],
+    })
+
     config.resolve.alias['defaultConfig$'] = require.resolve('tailwindcss/defaultConfig')
     config.module.rules.push({
       test: require.resolve('tailwindcss/defaultConfig'),

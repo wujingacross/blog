@@ -1,0 +1,55 @@
+export const showcase = [
+    {
+        name: 'OpenAI / ChatGPT',
+        slug: 'openai',
+        thumbnail: require('img/showcase/thumbnails/openai.com.png').default,
+        video: require('videos/showcase/openai.com.mp4').default,
+        description: 'Marketing website & chat interface',
+    },
+    {
+        name: 'Lemon Squeezy',
+        slug: 'lemon-squeezy',
+        thumbnail: require('img/showcase/thumbnails/app.lemonsqueezy.com.png').default,
+        video: require('videos/showcase/app.lemonsqueezy.com.mp4').default,
+        description: 'SaaS application',
+    },
+    {
+        name: 'Shopify',
+        slug: 'shopify',
+        thumbnail: require('img/showcase/thumbnails/shopify.com.png').default,
+        video: require('videos/showcase/shopify.com.mp4').default,
+        description: 'Ecommerce platform website',
+    },
+    {
+        name: 'Wealthfront',
+        slug: 'wealthfront',
+        thumbnail: require('img/showcase/thumbnails/wealthfront.com.png').default,
+        video: require('videos/showcase/wealthfront.com.mp4').default,
+        description: 'Fintech marketing website',
+    },
+    {
+        name: 'Netflix Global Top 10',
+        slug: 'netflix',
+        thumbnail: require('img/showcase/thumbnails/top10.netflix.com.png').default,
+        video: require('videos/showcase/top10.netflix.com.mp4').default,
+        description: 'Microsite',
+    },
+    {
+        name: 'Loom',
+        slug: 'loom',
+        thumbnail: require('img/showcase/thumbnails/loom.com.png').default,
+        video: require('videos/showcase/loom.com.mp4').default,
+        description: 'SaaS marketing website',
+    },
+    {
+        name: 'Der Spiegel',
+        slug: 'spiegel',
+        thumbnail: require('img/showcase/thumbnails/spiegel.de.png').default,
+        video: require('videos/showcase/spiegel.de.mp4').default,
+        description: 'News website',
+        dark: {
+            thumbnail: require('img/showcase/thumbnails/spiegel.de-dark.png').default,
+            video: require('videos/showcase/spiegel.de-dark.mp4').default,
+        },
+    },
+]
