@@ -145,7 +145,9 @@ export default function Hero() {
   const layout = !finished
   const md = supportsMd && isMd // 控制媒体查询md的样式生效
 
-  // console.log('Hero------- md=', md, supportsMd, isMd, wide)
+  // console.log(
+  //   `Hero------- md(supportsMd && isMd)=${md}, supportsMd=${supportsMd}, isMd=${isMd}, wide=${wide}`
+  // )
 
   // 组件是否加载
   useEffect(() => {
@@ -207,6 +209,7 @@ export default function Hero() {
     }
   }, [step])
 
+  // 动画结束之后，又进行了不同媒体查询的适配效果的展示（根据wide变量来进行左侧展示区域宽度的判断）
   useEffect(() => {
     if (!finished) return
     let count = 0
@@ -263,6 +266,7 @@ export default function Hero() {
               layout={layout}
               transition={TRANSITION}
               className="relative z-10 rounded-lg shadow-xl text-slate-900 dark:text-slate-300 mx-auto sm:w-[23.4375rem]"
+              // 先把鼠标的标记显示，然后改变左边效果展示区域的宽度，即可模仿鼠标拖拽动画的效果
               animate={
                 containerRect?.width
                   ? {
@@ -282,7 +286,7 @@ export default function Hero() {
                   }
                 )}
               >
-                {/* 1. cicle */}
+                {/* 1. 鼠标拖动的标记 cicle */}
                 <motion.div
                   layout={layout}
                   initial={{ opacity: 0 }}
@@ -401,7 +405,7 @@ export default function Hero() {
           <CodeWindow.Code
             ref={inViewRef}
             tokens={tokens}
-            tokenComponent={HeroToken} // 将tokenProps传到了tokenComponent组件中，即传到了HeroToken组件中
+            tokenComponent={HeroToken} // 将下面的tokenProps参数展开传到了tokenComponent组件中，即传到了HeroToken组件中
             tokenProps={{
               currentGroup: state.group,
               currentChar: state.char,
@@ -423,11 +427,11 @@ export default function Hero() {
 
                 if (groupIndex === 7) {
                   if (!supportsMd) return
-                  await cursorControls.start({ opacity: 0.5, transition: { delay: 1 } })
+                  await cursorControls.start({ opacity: 0.5, transition: { delay: 1 } }) // 拖动鼠标样式显示
                   if (!mounted.current) return
                   setWide(true)
                   setIsMd(true)
-                  await cursorControls.start({ opacity: 0, transition: { delay: 0.5 } })
+                  await cursorControls.start({ opacity: 0, transition: { delay: 0.5 } }) // 拖动鼠标样式隐藏
                 }
 
                 if (!mounted.current) return
@@ -480,15 +484,32 @@ function AnimatedToken({ isActiveToken, onComplete, children }) {
   )
 }
 
+/**
+ * ******** 代码展示最终的细节判断，'char:'开头的token，即一开始需要隐藏，样式动效开始后，代码按照节奏一点一点显示
+ * @param param0
+ * @returns
+ */
 function HeroToken({ currentGroup, currentChar, onCharComplete, onGroupComplete, ...props }) {
   const { token } = props
 
   // ******** char: 开头的是需要动效的部分，即上面ranges参数，整体可以输出 augment(tokens)后的tokens参数值 ********
   if (token[0].startsWith('char:')) {
-    // console.log('char: =>', token, token[0])
-    // token[0] char:8:0
-    // [NaN, 8, 0]
     const [, groupIndex, indexInGroup] = token[0].split(':').map((x) => parseInt(x, 10))
+    /**
+     * char: => ['char:0:0', ' '] char:0:0 true 0 0 0 0
+     * char: => ['char:0:1', 'p'] char:0:1 false 0 0 1 0
+     * 返回结果: [NaN, 8, 0]
+     */
+    // console.log(
+    //   'char: =>',
+    //   token,
+    //   token[0],
+    //   currentGroup === groupIndex && currentChar === indexInGroup,
+    //   groupIndex,
+    //   currentGroup,
+    //   indexInGroup,
+    //   currentChar
+    // )
 
     return (
       <AnimatedToken
@@ -505,13 +526,13 @@ function HeroToken({ currentGroup, currentChar, onCharComplete, onGroupComplete,
     )
   }
 
-  // console.log('no char: =>', token)
+  // console.log('普通代码: =>', token)
   return <Token {...props} />
 }
 
 function Layout({ left, right }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center mb-[112rem]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-20 sm:mt-24 lg:mt-32 lg:grid lg:gap-8 lg:grid-cols-12 lg:items-center">
       <div className="relative row-start-1 col-start-1 col-span-5 xl:col-span-6 -mt-10">
         <div className="h-[24.25rem] max-w-xl mx-auto lg:max-w-none flex items-center justify-center">
           <div className="w-full flex-none">{left}</div>
