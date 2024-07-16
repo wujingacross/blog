@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Layout, { siteTitle } from 'components/Layout'
 import Header from 'components/headers/Header'
+import Testimonials from 'components/home/Testimonials'
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       {/* 页面内容 */}
       <main className="mb-20 space-y-20 overflow-hidden">
         <Header />
+        <Testimonials />
       </main>
     </>
   )
