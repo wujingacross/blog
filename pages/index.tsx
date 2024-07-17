@@ -14,10 +14,10 @@ export default function Home() {
         <title>{siteTitle}</title>
       </Head>
       {/* 页面内容 */}
-      <main className="mb-20 space-y-20 overflow-hidden">
+      <div className="mb-20 space-y-20 overflow-hidden">
         <Header />
-        <Testimonials />
-      </main>
+      </div>
+      <Testimonials />
     </>
   )
 }

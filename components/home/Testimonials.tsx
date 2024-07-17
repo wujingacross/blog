@@ -855,14 +855,27 @@ let testimonials = [
   ],
 ]
 
-const TestimonialItem: React.FC<ITestimonialItem> = ({
-  content,
-  url,
-  author: { name, role, avatar },
-}) => {
+const TestimonialItem: React.FC<
+  ITestimonialItem & {
+    expanded: boolean
+  }
+> = ({ content, url, author: { name, role, avatar }, expanded }) => {
+  let [focusable, setFocusable] = useState(true)
+  let ref = useRef<HTMLLIElement>()
+
+  useEffect(() => {
+    if (ref.current.offsetTop !== 0) {
+      // 仅每列的第一个li元素的offsetTop为0，其余均不为0，即未展开数据列表的时候，仅每列的第一个li元素中的a标签有focus效果
+      setFocusable(false)
+    }
+  }, [])
+
   return (
-    <li className="text-sm leading-6">
-      <figure className="relative bg-slate-50 rounded-lg p-6">
+    <li ref={ref} className="text-sm leading-6">
+      <figure className="relative flex flex-col-reverse bg-slate-50 rounded-lg p-6">
+        <blockquote className="mt-6 text-slate-700">
+          {typeof content === 'string' ? <p>{content}</p> : content}
+        </blockquote>
         <figcaption className="flex items-center space-x-4">
           <img
             src={avatar}
@@ -870,10 +883,11 @@ const TestimonialItem: React.FC<ITestimonialItem> = ({
             loading="lazy"
             decoding="async"
           />
-          <div className="">
+          <div className="flex-auto">
             <div className="text-base text-slate-900 font-semibold">
               {url ? (
-                <a href={url}>
+                // tabIndex 配合 DOM.focus方法使用， 具有tabIndex属性的元素，都会变成可聚焦的, 参考文档：https://blog.csdn.net/m0_52409770/article/details/123432571
+                <a href={url} tabIndex={focusable || expanded ? 0 : -1}>
                   {/* 可以让整个卡片变成可点击 */}
                   <span className="absolute inset-0" />
                   {name}
@@ -885,9 +899,6 @@ const TestimonialItem: React.FC<ITestimonialItem> = ({
             <div className="mt-0.5">{role}</div>
           </div>
         </figcaption>
-        <blockquote className="mt-6 text-slate-700">
-          {typeof content === 'string' ? <p>{content}</p> : content}
-        </blockquote>
       </figure>
     </li>
   )
@@ -907,8 +918,9 @@ const Testimonials: React.FC<TestimonialsProps> = () => {
       initial.current = false
       return
     }
+    // 非首次逻辑
     if (expanded) {
-      ref.current.focus({ preventScroll: expanded })
+      ref.current.focus({ preventScroll: expanded }) // .focus({ preventScroll: true }) 聚焦时不会自动滚动到响应的位置
     } else {
       ref.current.focus()
       ref.current.scrollIntoView()
@@ -929,15 +941,10 @@ const Testimonials: React.FC<TestimonialsProps> = () => {
     function onScroll() {
       const bodyRect = document.body.getBoundingClientRect()
       const rect = ref.current.getBoundingClientRect()
-      let middle = rect.top + rect.height / 4 - bodyRect.top - window.innerHeight / 2
-      let isHalfWay = window.screenY > middle
-      // console.log(
-      //   '======',
-      //   window.screenY,
-      //   middle,
-      //   showCollapseButton && !isHalfWay,
-      //   !showCollapseButton && isHalfWay
-      // )
+      // let middle = rect.top + rect.height / 4 - bodyRect.top - window.innerHeight / 2
+      // let isHalfWay = window.screenY > middle // 不生效
+      let isHalfWay = -rect.top + window.innerHeight / 2 > rect.height / 2
+      // console.log('isHalfWay=', showCollapseButton, isHalfWay)
       if (showCollapseButton && !isHalfWay) {
         setShowCollapseButton(false)
       } else if (!showCollapseButton && isHalfWay) {
@@ -953,6 +960,11 @@ const Testimonials: React.FC<TestimonialsProps> = () => {
   return (
     <section
       ref={ref}
+      // tabIndex 配合 DOM.focus方法使用， 具有tabIndex属性的元素，都会变成可聚焦的
+      // 两个特殊的值，
+      // tabIndex={0} 会使该元素被与那些不具有tabIndex的元素放在一起，也就是说当我们切换元素时，具有tabIndex={0}的元素将排在那些具有tabIndex>=1的元素后面
+      // tabIndex={-1} 只允许以变成的方式聚焦于元素， Tab键会忽略这样的元素，但是elem.focus()有效
+      tabIndex={-1}
       className="relative max-w-7xl mx-auto px-4 focus:outline-none sm:px-3 md:px-5"
     >
       <h2 className="sr-only">Testimonials</h2>
@@ -974,7 +986,13 @@ const Testimonials: React.FC<TestimonialsProps> = () => {
               )}
             >
               {columeData.map((testimonialItem: ITestimonialItem) => {
-                return <TestimonialItem key={testimonialItem.content} {...testimonialItem} />
+                return (
+                  <TestimonialItem
+                    key={testimonialItem.content}
+                    {...testimonialItem}
+                    expanded={expanded}
+                  />
+                )
               })}
             </ul>
           )
@@ -983,10 +1001,10 @@ const Testimonials: React.FC<TestimonialsProps> = () => {
       {/* pointer-events-none 可以让当前div元素不响应点击事件，从而可以透过当前div元素，选中下层元素 */}
       <div
         className={clsx(
-          'inset-x-0 bottom-0 flex justify-center pt-32 pb-8 bg-gradient-to-t from-white pointer-events-none',
+          'inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-32 pb-8 pointer-events-none',
           expanded ? 'sticky -mt-52' : 'absolute',
-          transition && 'transition-opacity duration-300'
-          // expanded && (showCollapseButton ? 'opacity-100' : 'opacity-0')
+          transition && 'transition-opacity duration-300',
+          expanded && (showCollapseButton ? 'opacity-100' : 'opacity-0')
         )}
       >
         <button
