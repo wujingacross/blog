@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import defaultConfig from 'defaultConfig'
 import { IconContainer, Caption, BigText, Widont, Paragraph, Link } from 'components/home/common'
 import { Tabs } from 'components/Tabs'
@@ -124,19 +125,26 @@ const tabs = {
 
 function Bars({ sizes, className = '' }) {
   return (
-    <div className={`relative font-mono text-xs pt-6 space-y-4 ${className}`}>
-      {sizes.map((size) => (
-        <div
-          key={size}
-          className="h-6 origin-left bg-white ring-slate-700/5 shadow px-1 flex items-center dark:bg-indigo-500 dark:text-white dark:highlight-white/10"
-          style={{ width: defaultConfig.theme.width[size], borderRadius: 4 }}
-        >
-          <div className="flex-none w-0.5 h-1 bg-slate-300 dark:bg-white" />
-          <span className="flex-auto text-center">w-{size}</span>
-          <div className="w-0.5 h-1 bg-slate-300 dark:bg-white" />
-        </div>
+    <motion.ul
+      exit={{ opacity: 0 }}
+      className={`relative font-mono text-xs pt-6 space-y-4 ${className}`}
+    >
+      {sizes.map((size, i) => (
+        <li key={size}>
+          <motion.div
+            className="h-6 origin-left bg-white ring-slate-700/5 shadow px-1 flex items-center dark:bg-indigo-500 dark:text-white dark:highlight-white/10"
+            style={{ width: defaultConfig.theme.width[size], borderRadius: 4 }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: i * 0.1, damping: 100 }}
+          >
+            <div className="flex-none w-0.5 h-1 bg-slate-300 dark:bg-white" />
+            <span className="flex-auto text-center">w-{size}</span>
+            <div className="w-0.5 h-1 bg-slate-300 dark:bg-white" />
+          </motion.div>
+        </li>
       ))}
-    </div>
+    </motion.ul>
   )
 }
 
@@ -153,11 +161,17 @@ function Sizing() {
 }
 function Colors() {
   return (
-    <ul className="relative space-y-6 font-mono text-[0.625rem] leading-5 pt-5 px-5">
+    <motion.ul
+      exit={{ opacity: 0 }}
+      className="relative space-y-6 font-mono text-[0.625rem] leading-5 pt-5 px-5"
+    >
       {['sky', 'blue', 'indigo', 'purple'].map((color, i) => {
         return (
-          <li
+          <motion.li
             key={color}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: i * 0.1 }}
             className="bg-white rounded-lg shadow p-2 dark:bg-slate-900 dark:ring-white/10"
           >
             <ul className="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-5 xl:grid-cols-10 gap-2">
@@ -184,15 +198,18 @@ function Colors() {
               </svg>
               <span className="flex-1 text-right">{`${color}-900`}</span>
             </div>
-          </li>
+          </motion.li>
         )
       })}
-    </ul>
+    </motion.ul>
   )
 }
 function Typography() {
   return (
-    <div className="relative h-full flex flex-col justify-center space-y-8 sm:space-y-5 lg:space-y-8 xl:space-y-5 xl:px-5">
+    <motion.div
+      exit={{ opacity: 0 }}
+      className="relative h-full flex flex-col justify-center space-y-8 sm:space-y-5 lg:space-y-8 xl:space-y-5 xl:px-5"
+    >
       {[
         [
           'font-sans',
@@ -202,9 +219,12 @@ function Typography() {
         ['font-mono', 'text-sm leading-6 sm:leading-7 lg:leading-6 xl:leading-7'],
       ].map((font, i) => {
         return (
-          <div
+          <motion.div
             key={font[0]}
             className="sm:bg-white sm:rounded-lg sm:shadow sm:p-3 g:bg-transparent lg:rounded-none lg:ring-0 lg:shadow-none lg:p-0 xl:bg-white xl:rounded-lg xl:shadow xl:p-3 dark:ring-white/10 dark:sm:bg-slate-900 dark:sm:ring-1 dark:lg:bg-transparent dark:lg:ring-0 dark:xl:bg-slate-900 dark:xl:ring-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: i * 0.1 }}
           >
             <h4 className="text-xs leading-5 font-mono pb-2 border-b border-slate-100 text-slate-500 dark:border-slate-200/10">
               {font[0]}
@@ -217,21 +237,27 @@ function Typography() {
             >
               The quick brown fox jumps over the lazy dog.
             </div>
-          </div>
+          </motion.div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }
 function Shadows() {
   return (
-    <div className="relative h-full flex flex-col font-mono text-xs leading-5 pt-5 sm:pt-0 lg:pt-5 xl:pt-0 px-5 sm:px-8 lg:px-5 xl:px-8">
+    <motion.div
+      exit={{ opacity: 0 }}
+      className="relative h-full flex flex-col font-mono text-xs leading-5 pt-5 sm:pt-0 lg:pt-5 xl:pt-0 px-5 sm:px-8 lg:px-5 xl:px-8"
+    >
       <ul className="my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-6">
         {['shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl'].map(
           (shadow, i) => {
             return (
-              <li
+              <motion.li
                 key={shadow}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: [0.1, 0.1, 0.2, 0.2, 0.3, 0.3][i] }}
                 className="rounded-lg"
                 style={{
                   boxShadow:
@@ -243,17 +269,17 @@ function Shadows() {
                 <div className="bg-white rounded-lg pt-10 p-3 dark:bg-slate-700 dark:highlight-white/10">
                   {shadow}
                 </div>
-              </li>
+              </motion.li>
             )
           }
         )}
       </ul>
-    </div>
+    </motion.div>
   )
 }
 
 const ConstraintBased: React.FC<ConstraintBasedProps> = () => {
-  const [tab, setTab] = useState('Colors')
+  const [tab, setTab] = useState('Sizing')
 
   return (
     <section id="constraint-based" className="relative">
@@ -326,35 +352,47 @@ const ConstraintBased: React.FC<ConstraintBasedProps> = () => {
           </div>
         }
         right={
-          <CodeWindow className="w-full flex-auto flex min-h-0">
-            <CodeWindow.Code2 lines={tokens[tab].length}>
-              {tokens[tab].map((tokens, lineIndex) => (
-                <div key={lineIndex}>
-                  {tokens.map((token, tokenIndex) => {
-                    if (token.types[token.types.length - 1] === 'attr-value') {
-                      return (
-                        <span key={tokenIndex} className={getClassNameForToken(token)}>
-                          {token.content.split(/\[([^\]]+)\]/).map((part, i) =>
-                            i % 2 === 0 ? (
-                              part
-                            ) : (
-                              <span key={i} className="code-highlight bg-code-highlight">
-                                {part}
-                              </span>
-                            )
-                          )}
-                        </span>
-                      )
-                    }
-                    return (
-                      <span key={tokenIndex} className={getClassNameForToken(token)}>
-                        {token.content}
-                      </span>
-                    )
-                  })}
-                </div>
-              ))}
-            </CodeWindow.Code2>
+          <CodeWindow className="">
+            {/* initial={false} 组件在初始加载时不会执行动画效果 */}
+            <AnimatePresence initial={false} exitBeforeEnter>
+              <motion.div
+                key={tab}
+                className="w-full flex-auto flex min-h-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }} // 切换时没有切换效果，也看不出渐渐隐藏效果，加上transition={{ delay: 0.1 }}这个属性后，能看出切换的效果了，但是还是没有渐隐效果
+                exit={{ opacity: 0 }}
+              >
+                <CodeWindow.Code2 lines={tokens[tab].length}>
+                  {tokens[tab].map((tokens, lineIndex) => (
+                    <div key={lineIndex}>
+                      {tokens.map((token, tokenIndex) => {
+                        if (token.types[token.types.length - 1] === 'attr-value') {
+                          return (
+                            <span key={tokenIndex} className={getClassNameForToken(token)}>
+                              {token.content.split(/\[([^\]]+)\]/).map((part, i) =>
+                                i % 2 === 0 ? (
+                                  part
+                                ) : (
+                                  <span key={i} className="code-highlight bg-code-highlight">
+                                    {part}
+                                  </span>
+                                )
+                              )}
+                            </span>
+                          )
+                        }
+                        return (
+                          <span key={tokenIndex} className={getClassNameForToken(token)}>
+                            {token.content}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </CodeWindow.Code2>
+              </motion.div>
+            </AnimatePresence>
           </CodeWindow>
         }
       />
