@@ -3,8 +3,21 @@ import defaultConfig from 'defaultConfig'
 import { IconContainer, Caption, BigText, Widont, Paragraph, Link } from 'components/home/common'
 import { Tabs } from 'components/Tabs'
 import { GridLockup } from 'components/GridLockup'
+import { CodeWindow, getClassNameForToken } from 'components/codeWindow'
+import { lines as sizingSample } from '../../samples/sizing.html?highlight'
+import { lines as colorsSample } from '../../samples/colors.html?highlight'
+import { lines as typographySample } from '../../samples/typography.html?highlight'
+import { lines as shadowsSample } from '../../samples/shadows.html?highlight'
+import clsx from 'clsx'
 
 type ConstraintBasedProps = {}
+
+const tokens = {
+  Sizing: sizingSample,
+  Colors: colorsSample,
+  Typography: typographySample,
+  Shadows: shadowsSample,
+}
 
 const tabs = {
   Sizing: (selected) => (
@@ -138,9 +151,109 @@ function Sizing() {
     </>
   )
 }
+function Colors() {
+  return (
+    <ul className="relative space-y-6 font-mono text-[0.625rem] leading-5 pt-5 px-5">
+      {['sky', 'blue', 'indigo', 'purple'].map((color, i) => {
+        return (
+          <li
+            key={color}
+            className="bg-white rounded-lg shadow p-2 dark:bg-slate-900 dark:ring-white/10"
+          >
+            <ul className="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-5 xl:grid-cols-10 gap-2">
+              {Object.entries(defaultConfig.theme.colors[color]).map(([num, colorVal]) => {
+                return (
+                  <li
+                    key={num}
+                    className="pt-full rounded-sm ring-1 ring-inset ring-slate-900/5 dark:ring-0 dark:highlight-white/10"
+                    style={{
+                      backgroundColor: colorVal,
+                    }}
+                  />
+                )
+              })}
+            </ul>
+            <div className="mt-2 flex items-center justify-between text-slate-500">
+              <span className="flex-1">{`${color}-50`}</span>
+              <svg width="47" height="4" viewBox="0 0 47 4" fill="currentColor">
+                <circle cx="1.5" cy="2" r="1.5" className="text-slate-200 dark:text-slate-800" />
+                <circle cx="12.5" cy="2" r="1.5" className="text-slate-300 dark:text-slate-700" />
+                <circle cx="23.5" cy="2" r="1.5" className="text-slate-400 dark:text-slate-600" />
+                <circle cx="34.5" cy="2" r="1.5" className="text-slate-300 dark:text-slate-700" />
+                <circle cx="45.5" cy="2" r="1.5" className="text-slate-200 dark:text-slate-800" />
+              </svg>
+              <span className="flex-1 text-right">{`${color}-900`}</span>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+function Typography() {
+  return (
+    <div className="relative h-full flex flex-col justify-center space-y-8 sm:space-y-5 lg:space-y-8 xl:space-y-5 xl:px-5">
+      {[
+        [
+          'font-sans',
+          'text-sm leading-6 sm:text-base sm:leading-6 lg:text-sm lg:leading-6 xl:text-base xl:leading-6',
+        ],
+        ['font-serif', 'text-sm leading-6 sm:text-lg lg:text-sm lg:leading-6 xl:text-lg'],
+        ['font-mono', 'text-sm leading-6 sm:leading-7 lg:leading-6 xl:leading-7'],
+      ].map((font, i) => {
+        return (
+          <div
+            key={font[0]}
+            className="sm:bg-white sm:rounded-lg sm:shadow sm:p-3 g:bg-transparent lg:rounded-none lg:ring-0 lg:shadow-none lg:p-0 xl:bg-white xl:rounded-lg xl:shadow xl:p-3 dark:ring-white/10 dark:sm:bg-slate-900 dark:sm:ring-1 dark:lg:bg-transparent dark:lg:ring-0 dark:xl:bg-slate-900 dark:xl:ring-1"
+          >
+            <h4 className="text-xs leading-5 font-mono pb-2 border-b border-slate-100 text-slate-500 dark:border-slate-200/10">
+              {font[0]}
+            </h4>
+            <div
+              className={clsx(
+                'mt-2 sm:mt-3 lg:mt-2 xl:mt-3 text-slate-700 dark:text-slate-400',
+                ...font
+              )}
+            >
+              The quick brown fox jumps over the lazy dog.
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+function Shadows() {
+  return (
+    <div className="relative h-full flex flex-col font-mono text-xs leading-5 pt-5 sm:pt-0 lg:pt-5 xl:pt-0 px-5 sm:px-8 lg:px-5 xl:px-8">
+      <ul className="my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-6">
+        {['shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl'].map(
+          (shadow, i) => {
+            return (
+              <li
+                key={shadow}
+                className="rounded-lg"
+                style={{
+                  boxShadow:
+                    defaultConfig.theme.boxShadow[
+                      shadow.replace(/^shadow-/, '').replace('shadow', 'DEFAULT')
+                    ],
+                }}
+              >
+                <div className="bg-white rounded-lg pt-10 p-3 dark:bg-slate-700 dark:highlight-white/10">
+                  {shadow}
+                </div>
+              </li>
+            )
+          }
+        )}
+      </ul>
+    </div>
+  )
+}
 
 const ConstraintBased: React.FC<ConstraintBasedProps> = () => {
-  const [tab, setTab] = useState('Sizing')
+  const [tab, setTab] = useState('Colors')
 
   return (
     <section id="constraint-based" className="relative">
@@ -205,11 +318,45 @@ const ConstraintBased: React.FC<ConstraintBasedProps> = () => {
                 />
                 {/* 实际内容 */}
                 {tab === 'Sizing' && <Sizing key="sizing" />}
+                {tab === 'Colors' && <Colors key="colors" />}
+                {tab === 'Typography' && <Typography key="typography" />}
+                {tab === 'Shadows' && <Shadows key="shadows" />}
               </div>
             </div>
           </div>
         }
-        right={<div>right</div>}
+        right={
+          <CodeWindow className="w-full flex-auto flex min-h-0">
+            <CodeWindow.Code2 lines={tokens[tab].length}>
+              {tokens[tab].map((tokens, lineIndex) => (
+                <div key={lineIndex}>
+                  {tokens.map((token, tokenIndex) => {
+                    if (token.types[token.types.length - 1] === 'attr-value') {
+                      return (
+                        <span key={tokenIndex} className={getClassNameForToken(token)}>
+                          {token.content.split(/\[([^\]]+)\]/).map((part, i) =>
+                            i % 2 === 0 ? (
+                              part
+                            ) : (
+                              <span key={i} className="code-highlight bg-code-highlight">
+                                {part}
+                              </span>
+                            )
+                          )}
+                        </span>
+                      )
+                    }
+                    return (
+                      <span key={tokenIndex} className={getClassNameForToken(token)}>
+                        {token.content}
+                      </span>
+                    )
+                  })}
+                </div>
+              ))}
+            </CodeWindow.Code2>
+          </CodeWindow>
+        }
       />
     </section>
   )

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { forwardRef, useMemo } from 'react'
+import { forwardRef, useMemo, Fragment } from 'react'
 import clsx from 'clsx'
 export * from './Code'
 import { Code } from './Code'
@@ -63,3 +63,76 @@ CodeWindow.Code = forwardRef(({ tokens, initialLineNumber = 1, ...props }, ref) 
     </div>
   )
 })
+
+export function getClassNameForToken({ types, empty }) {
+  const typesSize = types.length
+  if (typesSize === 1 && types[0] === 'plain') {
+    return empty ? 'inline-block' : undefined
+  }
+  return [...types, empty ? 'inline-block' : 'token'].join(' ')
+}
+
+CodeWindow.Code2 = forwardRef(
+  (
+    {
+      lines = 0,
+      showLineNumbers = true,
+      initialLineNumber = 1,
+      overflow = true,
+      wrap = false,
+      className,
+      children,
+      language,
+    },
+    ref
+  ) => {
+    return (
+      <div
+        ref={ref}
+        className={clsx(className, 'w-full flex-auto flex min-h-0', {
+          'overflow-auto': overflow === true || overflow === 'y',
+        })}
+      >
+        <div className="w-full relative flex-auto">
+          <pre
+            className={clsx(
+              'flex min-h-full text-sm leading-6',
+              language && `language-${language}`
+            )}
+          >
+            {showLineNumbers && (
+              <div
+                aria-hidden="true"
+                className="hidden md:block text-slate-600 flex-none py-4 pr-4 text-right select-none w-[3.125rem]"
+              >
+                {Array.from({ length: lines }).map((_, i) =>
+                  i === 0 ? (
+                    i + initialLineNumber
+                  ) : (
+                    <Fragment key={i + initialLineNumber}>
+                      <br />
+                      {i + initialLineNumber}
+                    </Fragment>
+                  )
+                )}
+              </div>
+            )}
+            <code
+              className={clsx(
+                'flex-auto relative block text-slate-50',
+                {
+                  'overflow-auto': overflow === true || overflow === 'x',
+                  'whitespace-pre-wrap': wrap,
+                  'p-4': showLineNumbers,
+                },
+                language && `language-${language}`
+              )}
+            >
+              {children}
+            </code>
+          </pre>
+        </div>
+      </div>
+    )
+  }
+)

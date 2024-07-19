@@ -43,8 +43,6 @@ export function Button({
   reverse = false,
   ...props
 }) {
-  console.log('llll', className, props)
-
   const colorClasses = typeof color === 'string' ? colors[color] : color
   const darkColorClasses = typeof darkColor === 'string' ? colorsDark[darkColor] || [] : darkColor
   return (
